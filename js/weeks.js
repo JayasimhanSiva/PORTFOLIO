@@ -446,8 +446,8 @@ window.WEEKS = [
    },
    {
     "n": 5,
-    "title": "Forge: Full System Integration",
-    "sub": "5.1 Hardware · 5.2 Firebase backend & live test"
+    "title": "Forge: Firebase & Real-Time Integration",
+    "sub": "5.1 Sensors · 5.2 Firebase backend · 5.3 Live data"
    }
   ]
  },

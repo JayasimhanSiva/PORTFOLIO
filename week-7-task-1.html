@@ -9,10 +9,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script>if("scrollRestoration" in history)history.scrollRestoration="manual";</script>
-<link rel="stylesheet" href="css/style.css?v=1790572941">
-<link rel="stylesheet" href="css/responsive.css?v=1790572941">
-<link rel="stylesheet" href="css/fixes.css?v=1790572941">
-<link rel="stylesheet" href="css/protosem.css?v=1790572941"><link rel="stylesheet" href="css/task.css?v=1790572941"></head>
+<link rel="stylesheet" href="css/style.css?v=1790586442">
+<link rel="stylesheet" href="css/responsive.css?v=1790586442">
+<link rel="stylesheet" href="css/fixes.css?v=1790586442">
+<link rel="stylesheet" href="css/protosem.css?v=1790586442"><link rel="stylesheet" href="css/task.css?v=1790586442"></head>
 <body class="">
 <div class="cursor"><div class="cursor__dot"></div><div class="cursor__pill">View</div></div>
 <div class="card__link-hint"></div>
@@ -73,8 +73,8 @@
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Draggable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.4/dist/lenis.min.js"></script>
-<script src="js/main.js?v=1790572941"></script>
-<script src="js/tasks.js?v=1790572941"></script>
+<script src="js/main.js?v=1790586442"></script>
+<script src="js/tasks.js?v=1790586442"></script>
 <script>
 (() => {
   const main = document.querySelector('main'), body = document.getElementById('tkBody'), railBox = document.getElementById('tkRail');
@@ -128,7 +128,7 @@
   };
   const codeBlock = c => {
     const n = c.text.replace(/\n$/, '').split('\n').length;
-    const w = el('div', 'code' + (n > 34 ? ' is-clamped' : '')), bar = el('div', 'code__bar'), nm = el('span', 'code__name');
+    const w = el('div', 'code'), bar = el('div', 'code__bar'), nm = el('span', 'code__name');
     nm.append(el('b', '', c.name)); nm.append(el('span', 'code__lang', (c.lang ? ' · ' + c.lang : '') + (n > 12 ? ' · ' + n + ' lines' : '')));
     const btn = el('button', 'code__copy', 'Copy'); btn.type = 'button'; btn.setAttribute('data-cursor', 'Copy'); btn.setAttribute('aria-label', 'Copy ' + c.name);
     let tm = 0;
@@ -139,9 +139,7 @@
     bar.append(nm, btn);
     const bd = el('div', 'code__body'), pre = el('pre'), code = el('code', '', c.text.replace(/\n$/, ''));
     pre.append(code); pre.tabIndex = 0; pre.setAttribute('aria-label', c.name); bd.append(pre);
-    const more = el('button', 'code__more', 'Show all ' + n + ' lines'); more.type = 'button'; more.setAttribute('data-cursor', 'Open');
-    more.addEventListener('click', () => { w.classList.remove('is-clamped'); if (window.ScrollTrigger) ScrollTrigger.refresh(); });
-    w.append(bar, bd, more); return w;
+    w.append(bar, bd); return w;
   };
 
   const step = (s, n) => {
@@ -208,14 +206,14 @@
         b.append(grp);
       });
     }));
-    frag.append(blk(id('build'), '03', 'My build', b => {
+    if (P.story.length || P.media.length) frag.append(blk(id('build'), '03', 'My build', b => {
       const card = el('article', 'tcard tk-card'), inn = el('div', 'tcard__in');
       inn.append(el('div', 'tcard__k', multi ? 'Task ' + P.id : 'Task ' + pad(D.n)));
       P.story.forEach(t => inn.append(el('p', 'tcard__d', t)));
       if (P.media.length) { const g = el('div', 'tmedia' + (P.media.length === 1 ? ' one' : '')); P.media.forEach(m => g.append(figure(m, P.media.length))); inn.append(g); }
       card.append(inn); b.append(card);
     }));
-    frag.append(blk(id('notes'), '04', 'Notes', b => {
+    if (P.notes.length) frag.append(blk(id('notes'), '04', 'Notes', b => {
       const w = el('div', 'tk-notes'); P.notes.forEach(t => w.append(el('p', '', t))); b.append(w);
     }));
     return frag;
