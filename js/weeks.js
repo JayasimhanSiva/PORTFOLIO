@@ -441,8 +441,13 @@ window.WEEKS = [
    },
    {
     "n": 4,
-    "title": "Forge: Sensors, Cloud & Dashboard",
-    "sub": "4.1 Hardware · 4.2 Firebase backend · 4.3 Web dashboard"
+    "title": "Forge: Web Dashboard",
+    "sub": "HTML, CSS and JavaScript — a 3-page responsive web app for Forge"
+   },
+   {
+    "n": 5,
+    "title": "Forge: Full System Integration",
+    "sub": "5.1 Hardware · 5.2 Firebase backend & live test"
    }
   ]
  },

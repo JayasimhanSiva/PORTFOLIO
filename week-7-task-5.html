@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Task 3 — Google Assistant Voice Control via IFTTT — Siva Jayasimhan G</title>
-<meta name="description" content="Week 7, Task 3 of my ProtoSem journal: Google Assistant Voice Control via IFTTT. Terms explained, a beginner step-by-step guide, and how my build went.">
+<title>Task 5 — Forge: Full System Integration — Siva Jayasimhan G</title>
+<meta name="description" content="Week 7, Task 5 of my ProtoSem journal: Forge: Full System Integration. Terms explained, a beginner step-by-step guide, and how my build went.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23000'/><text x='16' y='23' font-family='Arial' font-weight='900' font-size='18' text-anchor='middle' fill='%23F2F0EF'>SJ</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -30,29 +30,29 @@
   <a href="index.html" class="disp">Home</a><a href="about.html" class="disp">//Bout Me</a><a href="projects.html" class="disp">Projects</a><a href="protosem.html" class="disp">Protosem</a>
 </div>
 
-<main data-week="7" data-task="3">
+<main data-week="7" data-task="5">
 
 <section class="ps-title tk-title glowed">
   <canvas class="shader page-glow" aria-hidden="true"></canvas>
-  <h1 class="stitle__word disp t-task" data-glyph>Task 03</h1>
-  <div class="stitle__subs mono muted"><span>Week 07</span><span>ProtoSem</span><span>Task 3 of 5</span><span>IFTTT</span></div>
+  <h1 class="stitle__word disp t-task" data-glyph>Task 05</h1>
+  <div class="stitle__subs mono muted"><span>Week 07</span><span>ProtoSem</span><span>Task 5 of 5</span><span>Forge</span></div>
 </section>
 <section class="tk-head">
   <a class="tk-back mono" href="protosem.html#week-7" data-cursor="Back"><span>←</span>Week 07 · ProtoSem Journal</a>
-  <h2 class="tk-h">Google Assistant Voice Control via IFTTT</h2>
-  <div class="tk-sub mono">IFTTT applets, webhooks, multi-platform chain</div>
-  <div class="tk-meta pd__meta"><div><div class="mono">Voice</div><div class="mono">Google Assistant</div></div><div><div class="mono">Automation</div><div class="mono">IFTTT applets</div></div><div><div class="mono">Chain</div><div class="mono">Webhook → Adafruit IO → MQTT</div></div><div><div class="mono">Rate limit</div><div class="mono">~1 command / 30 s</div></div></div>
+  <h2 class="tk-h">Forge: Full System Integration</h2>
+  <div class="tk-sub mono">DHT11 + LDR sensors, Firebase Realtime Database, and live data on the Task 4 dashboard</div>
+  <div class="tk-meta pd__meta"><div><div class="mono">Sensors</div><div class="mono">DHT11 + LDR</div></div><div><div class="mono">Cloud</div><div class="mono">Firebase Realtime Database</div></div><div><div class="mono">Sync</div><div class="mono">1–2 s latency</div></div><div><div class="mono">Result</div><div class="mono">Live dashboard · auto/manual relay</div></div></div>
 </section>
 <section class="ps-railwrap tk-rail" aria-label="On this page">
   <div class="ps-railhead tk-bar">
     <a class="tk-pill tk-pill--week mono" href="protosem.html#week-7" data-cursor="Back"><span aria-hidden="true">←</span>Week 07</a>
-    <span class="tk-bar__count mono muted">03 / 05</span>
-    <div class="tk-bar__nav"><a class="tk-pill mono" href="week-7-task-2.html" rel="prev" data-cursor="Task 02" aria-label="Prev task: Task 2"><span aria-hidden="true">←</span>Prev</a><a class="tk-pill mono" href="week-7-task-4.html" rel="next" data-cursor="Task 04" aria-label="Next task: Task 4">Next<span aria-hidden="true">→</span></a></div>
+    <span class="tk-bar__count mono muted">05 / 05</span>
+    <div class="tk-bar__nav"><a class="tk-pill mono" href="week-7-task-4.html" rel="prev" data-cursor="Task 04" aria-label="Prev task: Task 4"><span aria-hidden="true">←</span>Prev</a><span class="tk-pill tk-pill--off mono" aria-disabled="true">Next<span aria-hidden="true">→</span></span></div>
   </div>
   <div class="rail" id="tkRail" data-lenis-prevent></div>
 </section>
 <div class="tk-body" id="tkBody"></div>
-<section class="tk-next" aria-label="More tasks"><div class="mono tk-next__k">[ Keep going ]</div><a class="wrow" href="week-7-task-2.html" data-cursor="Open"><div class="wrow__n mono">Previous · Task 02</div><div class="wrow__c"><div class="wrow__t"><span class="roll"><span>Cloud MQTT Dashboard &amp; 230V Relay Control</span><span>Cloud MQTT Dashboard &amp; 230V Relay Control</span></span></div><div class="wrow__s mono">Adafruit IO, 230V relay switching, high-voltage safety</div></div><div class="wrow__e mono"><span class="wrow__arrow" style="margin:0 10px 0 0">←</span>[ Open ]</div></a><a class="wrow" href="week-7-task-4.html" data-cursor="Open"><div class="wrow__n mono">Next · Task 04</div><div class="wrow__c"><div class="wrow__t"><span class="roll"><span>Forge: Web Dashboard</span><span>Forge: Web Dashboard</span></span></div><div class="wrow__s mono">HTML, CSS and JavaScript — a 3-page responsive web app for Forge</div></div><div class="wrow__e mono">[ Open ]<span class="wrow__arrow">→</span></div></a><a class="wrow" href="protosem.html#week-7" data-cursor="Open"><div class="wrow__n mono">Week 07</div><div class="wrow__c"><div class="wrow__t"><span class="roll"><span>All tasks in Week 07</span><span>All tasks in Week 07</span></span></div><div class="wrow__s mono">IoT &amp; Embedded Systems — ESP32 Smart Home Build</div></div><div class="wrow__e mono"><span class="wrow__arrow" style="margin:0 10px 0 0">←</span>[ Back ]</div></a></section>
+<section class="tk-next" aria-label="More tasks"><div class="mono tk-next__k">[ Keep going ]</div><a class="wrow" href="week-7-task-4.html" data-cursor="Open"><div class="wrow__n mono">Previous · Task 04</div><div class="wrow__c"><div class="wrow__t"><span class="roll"><span>Forge: Web Dashboard</span><span>Forge: Web Dashboard</span></span></div><div class="wrow__s mono">HTML, CSS and JavaScript — a 3-page responsive web app for Forge</div></div><div class="wrow__e mono"><span class="wrow__arrow" style="margin:0 10px 0 0">←</span>[ Open ]</div></a><a class="wrow" href="protosem.html#week-7" data-cursor="Open"><div class="wrow__n mono">Week 07</div><div class="wrow__c"><div class="wrow__t"><span class="roll"><span>All tasks in Week 07</span><span>All tasks in Week 07</span></span></div><div class="wrow__s mono">IoT &amp; Embedded Systems — ESP32 Smart Home Build</div></div><div class="wrow__e mono"><span class="wrow__arrow" style="margin:0 10px 0 0">←</span>[ Back ]</div></a></section>
 <div class="lb" id="lb" role="dialog" aria-label="Image viewer"><button class="lb__x mono" type="button">[Close]</button><img id="lbImg" alt=""><div class="lb__cap mono"><span id="lbCap"></span><span>[Click to close]</span></div></div>
 </main>
 <!-- FOOTER -->
