@@ -1,0 +1,288 @@
+/* ===== reveal system (CSS transitions, toggled by IntersectionObserver) ===== */
+.rise .ch{transform:translateY(110%);transition:transform 1.1s var(--ease);transition-delay:calc(var(--i,0) * 35ms)}
+.rise.in .ch{transform:none}
+.rise-list .in,.rise-list .w > span{transform:translateY(105%);transition:transform 1s var(--ease);transition-delay:calc(var(--i,0) * 90ms)}
+.rise-list.in .in,.rise-list.in .w > span{transform:none}
+.fade-list > *{opacity:0;transform:translateY(12px);transition:opacity .8s var(--ease),transform .8s var(--ease);transition-delay:calc(200ms + var(--i,0) * 80ms)}
+.fade-list.in > *{opacity:1;transform:none}
+.rv{opacity:0;transform:translateY(40px);transition:opacity 1.1s var(--ease),transform 1.1s var(--ease);transition-delay:var(--d,0s)}
+.rv.in{opacity:1;transform:none}
+/* hero letters are driven by the intro timeline, never by the observer */
+.hero__title.rise .ch{transform:none;transition:none}
+
+/* ===== mobile menu must never leak on large screens ===== */
+.mnav{visibility:hidden;overflow:hidden}
+.mnav.open{visibility:visible}
+.mnav a{font-size:min(15vw,11vh);line-height:1.05}
+@media (min-width:810px){.mnav{display:none}}
+
+/* ===== collage: 6 photos, 3 columns x 2 rows, measured 440x412 grid ===== */
+.collage{position:relative;z-index:2;margin-bottom:0}
+@media (min-width:810px){
+  .collage__grid{height:calc(848 * var(--u));margin-left:calc(33 * var(--u));width:calc(1360 * var(--u))}
+  .collage__col:nth-child(1){left:0}
+  .collage__col:nth-child(2){left:calc(460 * var(--u))}
+  .collage__col:nth-child(3){left:calc(920 * var(--u))}
+  /* orange glow rises from under the photos into the Projects section */
+  .rec{margin-top:calc(-160 * var(--u))}
+  .rec__glow{top:0;height:calc(760 * var(--u))}
+}
+@media (max-width:809px){
+  .collage__grid{height:calc(2 * 44vw + 8px)}
+  .rec{margin-top:-60px}
+  .rec__glow{top:0;height:360px}
+}
+.rec__glow{z-index:0}
+.rec .stitle,.rec__hint,.rec__stage{position:relative;z-index:3}
+
+/* no sideways scroll on any device */
+html,body{overflow-x:clip}
+
+/* ===== LET'S WORK TOGETHER: photo / words / cut-out (word-behind-subject) ===== */
+.lwt__img img,.lwt__front img{width:100%;height:120%;object-fit:cover;object-position:50% 35%;filter:none}
+.lwt__front{position:absolute;left:0;right:0;top:0;overflow:hidden;z-index:3;pointer-events:none}
+.lwt__words{z-index:2}
+.lwt__img{height:calc(1137 * var(--u))}
+.lwt__front{height:calc(1137 * var(--u))}
+@media (max-width:809px){.lwt__img,.lwt__front{height:112vw}}
+
+/* ===== hero → logo morph ===== */
+.hero__title{left:50%;right:auto;width:max-content;display:block}
+.nav.is-morph .nav__logo{transition:none;transform:none;opacity:0;pointer-events:auto}
+.nav.is-morph > a.mono{will-change:transform}
+
+/* photo placement: scale 1.17 (2340u wide), head centred on the "O" of WORK */
+@media (min-width:810px){
+  .lwt__img img,.lwt__front img{position:absolute;width:calc(2340 * var(--u));height:auto;max-width:none;left:calc(-555 * var(--u));top:calc(-270 * var(--u));object-fit:fill}
+}
+@media (max-width:809px){
+  .lwt__img,.lwt__front{height:104vw}
+  .lwt__img img,.lwt__front img{position:absolute;width:200vw;height:auto;max-width:none;left:-52.5vw;top:-22.7vw;object-fit:fill}
+}
+.hero__fade{display:none}
+
+/* ===== collage photo reveal: fade up out of the dark + settle ===== */
+.collage__grid{will-change:transform}
+.collage .ph{overflow:hidden;background:#000;position:relative}
+.collage .ph img{display:block;opacity:0;transform:scale(1.18) translateY(6%);filter:brightness(.25) blur(6px);
+  transition:opacity 1.3s cubic-bezier(.22,1,.36,1),transform 1.8s cubic-bezier(.16,1,.3,1),filter 1.6s cubic-bezier(.22,1,.36,1);
+  transition-delay:calc(var(--i,0) * 110ms)}
+.collage .ph.in img{opacity:1;transform:none;filter:brightness(1) blur(0)}
+@media (min-width:810px){.collage .ph{width:calc(440 * var(--u));height:calc(412 * var(--u))}.collage .ph img{width:100%;height:100%}}
+@media (max-width:809px){.collage .ph{width:31.5vw;height:44vw}.collage .ph img{width:100%;height:100%}}
+@media (prefers-reduced-motion:reduce){.collage .ph img{opacity:1;transform:none;filter:none}}
+
+/* ===== hero name: slow white↔cyan sheen sweeping across (one continuous gradient) ===== */
+.hero__title.grad-live{background:linear-gradient(100deg,#f5fdff 0%,#c4f0f9 18%,#62cde6 42%,#3fbad8 55%,#c4f0f9 78%,#f5fdff 100%);
+  background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:heroSheen 11s ease-in-out infinite alternate}
+.hero__title.grad-live .ch{background:none!important;-webkit-text-fill-color:transparent;color:transparent}
+@keyframes heroSheen{from{background-position:0% 50%}to{background-position:100% 50%}}
+
+/* ===== performance ===== */
+.cursor{will-change:transform;contain:layout style}
+.collage .ph img{filter:brightness(.25)}                   /* no blur filter (GPU-heavy) */
+.collage .ph.in img{filter:brightness(1)}
+.collage__col,.lwt__img img,.lwt__front img,.hero__title,.deck{will-change:transform}
+.shader{transform:translateZ(0)}
+.split .c{will-change:opacity}
+section,footer{contain:paint}
+.hero{contain:none}
+
+/* cut-out layer stops exactly where the TOGETHER row begins, so its letters are never covered */
+@media (min-width:810px){.lwt__front{height:calc(579 * var(--u))}}
+@media (max-width:809px){.lwt__front{height:52vw}}
+/* photo darkening must be zero wherever the cut-out layer sits, or a seam appears */
+.lwt__img::after{background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0) 53%,rgba(0,0,0,.5) 76%,#000 100%)}
+
+/* ===== loader + intro (CSS driven) ===== */
+.loader{transition:opacity .6s ease}
+.loader.out{opacity:0}
+.loader__txt{transition:opacity 1.1s ease-in-out}
+.loader__txt.show{opacity:1}
+.hero__title{transform-origin:0 0;transform:translate3d(-50%,0,0);will-change:transform,opacity}
+.hero__title.h-pre .ch{transform:translateY(105%);opacity:0}
+.hero__title.h-in .ch{transform:none;opacity:1;transition:transform 1.4s var(--ease),opacity 1s ease;transition-delay:calc(var(--i,0) * 45ms)}
+.hero__title.grad-live .ch{transition:none}
+.nav.n-pre > *:not(.nav__logo){translate:0 -20px;opacity:0}
+.nav.n-in > *:not(.nav__logo){translate:0 0;opacity:1;transition:translate 1s var(--ease),opacity 1s ease;transition-delay:calc(150ms + var(--i,0) * 60ms)}
+.nav.is-morph .nav__logo{opacity:0}
+
+/* ===== project cards without photos ===== */
+.card--text .card__media{background:radial-gradient(120% 90% at 50% 120%,rgba(220,74,21,.55) 0%,rgba(150,48,12,.28) 38%,rgba(0,0,0,0) 70%),#0a0a0a;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;justify-content:space-between;padding:calc(28 * var(--u));transition:border-color .6s var(--ease)}
+.card--text:hover .card__media{border-color:rgba(255,255,255,.28)}
+.card__num{font-size:calc(120 * var(--u));color:var(--fg);line-height:.9;transition:transform 1s var(--ease)}
+.card--text:hover .card__num{transform:translateY(-6px)}
+.card__meta{color:var(--muted);position:absolute;right:calc(28 * var(--u));top:calc(28 * var(--u))}
+@media (max-width:809px){.card__num{font-size:64px}.card--text .card__media{padding:16px}.card__meta{right:16px;top:16px}}
+
+/* page scroll lock while a ProtoSem week is open */
+/* page stays exactly as it is under an open week (no scrollbar/layout change) */
+
+/* ===== nav: clock pinned right; links reserve its width (never overflows) ===== */
+@media (min-width:810px){
+  .nav__time{position:absolute;right:var(--pad);top:max(14px,calc(21 * var(--u)))}
+  .nav.is-scrolled{grid-template-columns:1fr auto auto auto;padding-right:calc(var(--pad) + var(--timew,190px) + 48 * var(--u))}
+}
+
+/* ===== phones: keep the clock visible, just left of MENU ===== */
+@media (max-width:809px){
+  .nav .nav__time{display:flex!important;position:static;justify-self:end;align-self:center;height:auto;font-size:11px;line-height:16px;gap:0}
+  .nav .nav__time .nav__tz{display:none}
+  .nav,.nav.is-scrolled{grid-template-columns:1fr auto auto;column-gap:16px;align-items:center}
+  .nav__menu-btn{align-self:center}
+}
+
+/* ===== big titles: sized in pure CSS from measured Archivo proportions ======
+   font-size = available width / (word width per 1px). No JS, no font-timing race.
+   Available width = viewport − side padding − scrollbar allowance.            */
+.t-protosem,.t-projects,.t-sw,.t-about{max-width:100%;white-space:nowrap}
+.t-protosem{font-size:calc((97.08vw - 22px) / 5.2978 * .94)!important}
+.t-projects{font-size:calc((97.08vw - 22px) / 4.9828 * .94)!important}
+.t-sw{font-size:calc((97.08vw - 22px) / 6.5579 * .94)!important}
+.t-about{font-size:calc((97.08vw - 36px) / 4.6804 * .94)!important}
+@media (max-width:809px){
+  .t-protosem{font-size:calc((100vw - 38px) / 5.2978 * .94)!important}
+  .t-projects{font-size:calc((100vw - 38px) / 4.9828 * .94)!important}
+  .t-sw{font-size:calc((100vw - 38px) / 6.5579 * .94)!important}
+  .t-about{font-size:calc((100vw - 52px) / 4.6804 * .94)!important}
+}
+/* never let anything push the page sideways */
+.stitle,.page-title,.ps-title,.ab-word{max-width:100vw;overflow:hidden}
+
+/* ===== orange glow on ProtoSem / Projects (landing shader, 50% speed) ===== */
+.glowed{position:relative;isolation:isolate}
+.page-glow{position:absolute;left:0;top:0;width:100%;height:100%;z-index:-1;pointer-events:none;
+  -webkit-mask:linear-gradient(180deg,#000 0%,#000 80%,transparent 100%);mask:linear-gradient(180deg,#000 0%,#000 80%,transparent 100%)}
+
+
+/* ===== nav clock: steady colon, no hover label ===== */
+.nav__time .colon{animation:none!important;opacity:1!important}
+.nav__tz{display:none!important}
+
+/* ===== project deck: 3 stacked cards, reference-style fan ===== */
+.rec__stage{display:flex;justify-content:center}
+.deckstack{position:relative;touch-action:none;margin-top:calc(40 * var(--u))}
+.deckstack .deck{position:absolute;left:0;top:0;transform-origin:50% 100%;will-change:transform}
+.deckstack .deck:not(.is-front) .deck__l-in,.deckstack .deck:not(.is-front) .deck__r > *{opacity:0;transition:opacity .25s ease}
+.deckstack .deck.is-front .deck__l-in,.deckstack .deck.is-front .deck__r > *{opacity:1;transition:opacity .45s ease .15s}
+.deckstack .deck:not(.is-front) .deck__l,.deckstack .deck:not(.is-front) .deck__r{box-shadow:0 -1px 0 rgba(0,0,0,.25)}
+@media (max-width:809px){.deckstack{width:100%;max-width:420px}.deckstack .deck{width:100%}}
+
+/* ===== About: internships ===== */
+.intern{margin-top:18px;border:1px solid #2a2a2a;padding:16px 18px}
+.intern__top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.intern__top b{font:600 15px var(--sans);color:#fff}
+.intern__top span{font:500 10px var(--mono);color:#888}
+.intern__role{font:500 10px var(--mono);text-transform:uppercase;color:#888;margin-top:6px}
+.intern ul{list-style:none;margin-top:12px}
+.intern li{font:400 12px/1.55 var(--sans);color:#bbb;padding-left:14px;position:relative;margin-top:6px}
+.intern li::before{content:"";position:absolute;left:0;top:.65em;width:5px;height:1px;background:#888}
+/* reference fan: back cards show only their paper left panel, rising from the bottom-left */
+.deckstack .deck{transform-origin:0% 100%}
+.deckstack .deck:not(.is-front) .deck__r{opacity:0;transition:opacity .25s ease}
+.deckstack .deck.is-front .deck__r{opacity:1;transition:opacity .45s ease .15s}
+/* while the front card is dragged, the next card is fully readable underneath */
+.deckstack.dragging .deck.is-next .deck__l-in,
+.deckstack.dragging .deck.is-next .deck__r,
+.deckstack.dragging .deck.is-next .deck__r > *{opacity:1;transition:opacity .3s ease}
+/* a thrown card keeps its content until it has settled at the back of the deck */
+.deckstack .deck.is-flying .deck__l-in,
+.deckstack .deck.is-flying .deck__r,
+.deckstack .deck.is-flying .deck__r > *{opacity:1!important;transition:none}
+
+/* ================= ABOUT: blocks that match the rest of the site ================= */
+.ab{padding:calc(40 * var(--u)) var(--pad) calc(200 * var(--u))}
+.ab-blk{display:grid;grid-template-columns:calc(237 * var(--u)) minmax(0,1fr);padding:calc(48 * var(--u)) 0;border-top:1px solid rgba(255,255,255,.12)}
+.ab-blk:last-child{border-bottom:1px solid rgba(255,255,255,.12)}
+.ab-blk__l{color:var(--muted);padding-top:.35em}
+.ab-blk__b{max-width:calc(900 * var(--u))}
+.ab-h{font-family:var(--sans);font-weight:500;font-size:max(20px,calc(32 * var(--u)));line-height:1.2;letter-spacing:-.02em;color:var(--fg)}
+.ab-meta{margin-top:10px}
+/* id card */
+.idcard{display:flex;align-items:stretch;gap:0;width:max-content;max-width:100%}
+.idcard img{width:calc(104 * var(--u));min-width:72px;aspect-ratio:1;object-fit:cover}
+.idcard__x{display:flex;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-left:0}
+.idcard__info{writing-mode:vertical-rl;transform:rotate(180deg);background:var(--fg);color:#000;display:flex;align-items:center;justify-content:center;padding:0 4px;font-size:10px}
+.idcard__name{padding:calc(14 * var(--u)) calc(22 * var(--u))}
+.idcard__name .disp{font-size:max(20px,calc(34 * var(--u)));letter-spacing:-.03em}
+.idcard__stats{display:flex;flex-wrap:wrap;gap:6px calc(20 * var(--u));margin-top:10px;color:var(--muted)}
+.idcard__stats b{color:var(--fg);font-weight:500}
+/* facts */
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:calc(22 * var(--u)) calc(40 * var(--u))}
+.facts dt{color:var(--muted)}
+.facts dd{font-family:var(--sans);font-weight:500;font-size:max(16px,calc(22 * var(--u)));line-height:1.3;letter-spacing:-.01em;margin-top:6px}
+/* skills */
+.skills{display:flex;flex-direction:column}
+.skill2{display:grid;grid-template-columns:calc(46 * var(--u)) minmax(0,1fr);gap:calc(20 * var(--u));padding:calc(18 * var(--u)) 0;border-bottom:1px solid rgba(255,255,255,.08);align-items:start}
+.skill2:last-child{border-bottom:0}
+.skill2__ic{width:calc(46 * var(--u));min-width:34px;aspect-ratio:1;border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center}
+.skill2__ic svg{width:45%;height:45%;stroke:var(--fg);fill:none;stroke-width:1.3}
+.skill2 h4{font-family:var(--sans);font-weight:500;font-size:max(16px,calc(24 * var(--u)));letter-spacing:-.02em}
+.skill2 p{font-family:var(--sans);font-size:max(13px,calc(16 * var(--u)));line-height:1.5;color:#9c9a98;margin-top:6px}
+/* internships */
+.job + .job{margin-top:calc(40 * var(--u));padding-top:calc(40 * var(--u));border-top:1px solid rgba(255,255,255,.08)}
+.job__top{display:flex;justify-content:space-between;align-items:baseline;gap:20px}
+.job ul{list-style:none;margin-top:calc(18 * var(--u))}
+.job li{font-family:var(--sans);font-size:max(14px,calc(17 * var(--u)));line-height:1.55;color:#c9c6c4;padding-left:22px;position:relative;margin-top:10px}
+.job li::before{content:"";position:absolute;left:0;top:.72em;width:10px;height:1px;background:rgba(255,255,255,.4)}
+@media (max-width:809px){
+  .ab{padding:24px var(--pad) 120px}
+  .ab-blk{grid-template-columns:1fr;row-gap:14px;padding:28px 0}
+  .facts{grid-template-columns:1fr}
+  .idcard__name .disp{font-size:18px}
+  .job__top{flex-direction:column;gap:4px}
+}
+/* avatars removed: keep the name row and ID card balanced without them */
+.idcard__x{border-left:1px solid rgba(255,255,255,.1)}
+
+
+/* ================= COLLAGE v2: five photos, 2-1-2 with a lowered centre ================= */
+@media (min-width:810px){
+  .collage__grid{height:calc(860 * var(--u));width:calc(1360 * var(--u));margin-left:calc(40 * var(--u))}
+  .collage__col{width:calc(440 * var(--u));gap:calc(14 * var(--u))}
+  .collage__col:nth-child(1){left:0;top:0}
+  .collage__col:nth-child(2){left:calc(460 * var(--u));top:calc(300 * var(--u))}
+  .collage__col:nth-child(3){left:calc(920 * var(--u));top:0}
+  .collage .ph{width:calc(440 * var(--u))}
+  .collage .ph--p{height:calc(587 * var(--u))}      /* 3:4 portrait */
+  .collage .ph--l{height:calc(247 * var(--u))}      /* 16:9 landscape */
+}
+@media (max-width:809px){
+  .collage__grid{position:relative;height:auto;width:100%;margin-left:0;display:flex;flex-direction:column;gap:10px}
+  .collage__col{position:static;width:100%;gap:10px}
+  .collage .ph{width:100%}
+  .collage .ph--p{height:118vw}
+  .collage .ph--l{height:56vw}
+  .collage__col:nth-child(n){left:auto;top:auto;display:flex}
+}
+.collage .ph img{width:100%;height:100%;object-fit:cover}
+
+
+/* ---- collage v3: six photos, 2-2-2, nothing clipped ---- */
+@media (min-width:810px){
+  .collage{margin-top:calc(90 * var(--u));padding:calc(60 * var(--u)) 0 calc(120 * var(--u))}
+  .collage__grid{height:calc(880 * var(--u))}
+  .collage__col:nth-child(2){top:calc(150 * var(--u))}
+  .collage .ph--w{height:calc(293 * var(--u))}     /* 3:2 */
+}
+@media (max-width:809px){.collage .ph--w{height:66vw}}
+
+
+/* ---- collage v3.1: geometry that can never reach an edge ---- */
+@media (min-width:810px){
+  .collage{padding:130px 0 170px}
+  .collage__grid{width:calc(1330 * var(--u));margin-left:calc(55 * var(--u))}
+  .collage__col{width:calc(430 * var(--u))}
+  .collage .ph{width:calc(430 * var(--u))}
+  .collage .ph--p{height:calc(573 * var(--u))}
+  .collage .ph--l{height:calc(242 * var(--u))}
+  .collage .ph--w{height:calc(287 * var(--u))}
+  .collage__col:nth-child(2){left:calc(450 * var(--u))}
+  .collage__col:nth-child(3){left:calc(900 * var(--u))}
+}
+@media (max-width:809px){.collage{padding:40px 0 60px}}
+
+/* ===== What I Can Do: descenders (g, y) were cut off; hover now rolls to a warm copy ===== */
+.can__item{overflow:visible;clip-path:inset(.06em -.06em -.075em -.06em)}
+.can__item .roll{overflow:visible;clip-path:inset(.06em -.06em -.075em -.06em)}
+.can__item .roll span + span{color:#f1923e}

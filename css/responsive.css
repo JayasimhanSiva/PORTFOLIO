@@ -1,0 +1,176 @@
+/* ================= RESPONSIVE SYSTEM =================
+   --u = 1 reference pixel of the 1440px-wide design. Every geometry value
+   measured on the reference scales proportionally on any monitor (810px up to 4K),
+   text keeps a readable floor. Phones (<810px) get a dedicated stacked layout. */
+:root{--u:calc(100vw / 1440)}
+
+@media (min-width:810px){
+  :root{--pad:calc(21 * var(--u))}
+  .mono{font-size:max(11px,calc(15 * var(--u)));line-height:1.4}
+  .roll{height:1.4em}
+  .nav{height:calc(62 * var(--u));padding-top:max(14px,calc(21 * var(--u)))}
+  .nav__logo{font-size:max(16px,calc(24 * var(--u)));top:max(10px,calc(14 * var(--u)))}
+  .nav.is-scrolled{column-gap:calc(48 * var(--u))}
+  .nav__time{height:1.4em;line-height:1.4em}
+  .loader__txt{font-size:calc(81 * var(--u));gap:calc(26 * var(--u))}
+  /* intro */
+  .intro{grid-template-columns:calc(237 * var(--u)) calc(790 * var(--u));padding:calc(180 * var(--u)) var(--pad) calc(160 * var(--u))}
+  .intro__p1{font-size:max(22px,calc(40 * var(--u)));line-height:1.2;letter-spacing:-.02em}
+  .intro__p2{font-size:max(18px,calc(32 * var(--u)));line-height:1.2;letter-spacing:-.02em;margin-top:calc(32 * var(--u))}
+  .intro__body{max-width:none}
+  .intro__me{margin-top:calc(90 * var(--u))}
+  .intro__me img{width:calc(48 * var(--u));height:calc(48 * var(--u))}
+  /* works */
+  .works{padding:calc(100 * var(--u)) var(--pad) 0;column-gap:calc(21 * var(--u));row-gap:calc(74 * var(--u))}
+  .card__title{font-size:max(20px,calc(40 * var(--u)));line-height:1.2;margin-top:calc(13 * var(--u))}
+  .card__tags{left:calc(28 * var(--u));bottom:calc(24 * var(--u))}
+  /* collage */
+  .collage{margin-top:calc(120 * var(--u))}
+  .collage__grid{height:calc(1272 * var(--u));margin-left:calc(-427 * var(--u));width:calc(2300 * var(--u))}
+  .collage__col{width:calc(440 * var(--u));gap:calc(12 * var(--u))}
+  .collage__col img{width:calc(440 * var(--u));height:calc(412 * var(--u))}
+  .collage__col:nth-child(2){left:calc(460 * var(--u))}
+  .collage__col:nth-child(3){left:calc(920 * var(--u))}
+  .collage__col:nth-child(4){left:calc(1380 * var(--u))}
+  .collage__col:nth-child(5){left:calc(1840 * var(--u))}
+  .collage__band{margin-top:calc(-120 * var(--u));height:calc(548 * var(--u))}
+  .collage__band canvas,.collage__band::after{height:calc(548 * var(--u))}
+  /* project deck (recommender layout) */
+  .rec{padding-top:calc(269 * var(--u));min-height:calc(1100 * var(--u))}
+  .rec__glow{height:calc(560 * var(--u));top:calc(-80 * var(--u))}
+  .rec__hint{margin-top:calc(100 * var(--u))}
+  .rec__stage{padding-top:calc(49 * var(--u));height:calc(560 * var(--u))}
+  .deck__l{width:calc(558 * var(--u));height:calc(300 * var(--u));padding:calc(8 * var(--u));border-radius:calc(8 * var(--u))}
+  .deck__l-in{padding:calc(30 * var(--u)) calc(28 * var(--u));border-radius:calc(4 * var(--u))}
+  .deck__l-in p{font-size:max(11px,calc(17 * var(--u)))}
+  .deck__r{width:calc(302 * var(--u));height:calc(300 * var(--u));padding:0 calc(20 * var(--u)) calc(66 * var(--u));border-radius:calc(8 * var(--u))}
+  .deck__r .mono{font-size:max(9px,calc(13 * var(--u)))}
+  .deck__r h4{font-size:max(16px,calc(32 * var(--u)));line-height:1.2;margin-top:calc(8 * var(--u))}
+  /* what I can do */
+  .can{padding:calc(102 * var(--u)) var(--pad) calc(200 * var(--u))}
+  .can__list{margin:calc(-29 * var(--u)) 0 0 calc(513 * var(--u))}
+  .can__item{font-size:calc(70 * var(--u));line-height:calc(74 * var(--u));height:calc(74 * var(--u));margin-bottom:calc(16 * var(--u))}
+  .can__item .roll{height:calc(74 * var(--u))}
+  .can__item .roll span{line-height:calc(74 * var(--u))}
+  /* work together + end */
+  .lwt__img{height:calc(1137 * var(--u))}
+  .lwt__words{top:calc(318 * var(--u))}
+  .lwt__words .l2{margin-top:calc(261 * var(--u) - 1em)}
+  .end{padding-top:calc(71 * var(--u))}
+  .end__p{font-size:max(20px,calc(40 * var(--u)));line-height:1.2;max-width:calc(1140 * var(--u));margin-top:calc(32 * var(--u))}
+  .btn-pill{margin-top:calc(64 * var(--u));height:max(38px,calc(49 * var(--u)));padding:0 max(16px,calc(24 * var(--u)))}
+  .more{padding-top:calc(96 * var(--u))}
+  .socials{gap:calc(64 * var(--u));margin-top:calc(60 * var(--u))}
+  .social{font-size:max(22px,calc(40 * var(--u)))}
+  .social svg{width:1em;height:1em}
+  /* footer */
+  .footer{height:calc(900 * var(--u))}
+  .footer .shader{height:calc(585 * var(--u))}
+  .footer__top{top:calc(747 * var(--u))}
+  .footer__links{top:calc(710 * var(--u));gap:calc(16 * var(--u))}
+  .footer__copy{top:calc(746 * var(--u))}
+  /* inner pages */
+  .page-title{padding-top:calc(230 * var(--u))}
+  .ab-intro{padding-top:calc(210 * var(--u));grid-template-columns:calc(300 * var(--u)) 1fr}
+  .ab-intro p{font-size:max(18px,calc(28 * var(--u)))}
+  .pd{padding-top:calc(190 * var(--u))}
+  .pd__body{grid-template-columns:calc(237 * var(--u)) 1fr}
+  .pd__body li{font-size:max(18px,calc(32 * var(--u)));line-height:1.2}
+  .pd__body ul{max-width:calc(960 * var(--u))}
+  .ab-intro p{max-width:calc(830 * var(--u))}
+  .sheet{max-width:max(560px,calc(560 * var(--u)))}
+}
+
+/* tablets & small laptops: give text columns more room */
+@media (min-width:810px) and (max-width:1199px){
+  .intro{grid-template-columns:calc(200 * var(--u)) 1fr}
+  .deck__l-in p{font-size:12px;line-height:1.35}
+}
+
+/* phones */
+@media (max-width:809px){
+  :root{--pad:16px}
+  .mono{font-size:11px;line-height:16px}
+  .roll{height:16px}
+  .nav{grid-template-columns:1fr auto;height:52px;padding-top:16px}
+  .nav.is-scrolled{grid-template-columns:1fr auto;column-gap:0}
+  .nav .nav__hide-m{display:none}
+  .nav__menu-btn{display:block!important;justify-self:end}
+  .nav__logo{font-size:18px;top:14px}
+  .loader__txt{font-size:36px;gap:12px}
+  .hero__title{font-size:22vw;top:36vh}
+  .intro{grid-template-columns:1fr;row-gap:16px;padding:120px var(--pad) 80px}
+  .intro__p1{font-size:24px;line-height:29px}
+  .intro__p2{font-size:18px;line-height:23px;margin-top:20px}
+  .intro__me{margin-top:40px}
+  .stitle__word{font-size:12.2vw}
+  .rec .stitle__word{font-size:17vw}
+  .stitle__subs{grid-template-columns:repeat(4,1fr);margin-top:4px}
+  .stitle__subs > *{font-size:9px}
+  .works{grid-template-columns:1fr;row-gap:40px;padding:48px var(--pad) 0}
+  .card__title{font-size:24px;line-height:29px;margin-top:10px}
+  .card__tags{left:10px;bottom:10px}
+  .collage{margin-top:80px}
+  .collage__grid{height:calc(3 * 44vw + 16px);width:100%;margin-left:0}
+  .collage__col{width:31.5vw;gap:6px}
+  .collage__col img{width:31.5vw;height:44vw}
+  .collage__col:nth-child(1){left:1.5vw}
+  .collage__col:nth-child(2){left:34.25vw}
+  .collage__col:nth-child(3){left:67vw}
+  .collage__col:nth-child(4),.collage__col:nth-child(5){display:none}
+  .collage__band{margin-top:-40px;height:260px}
+  .collage__band canvas,.collage__band::after{height:260px}
+  .rec{padding-top:120px;min-height:0;padding-bottom:40px}
+  .rec__glow{height:300px}
+  .rec__hint{margin-top:48px}
+  .rec__stage{height:auto;padding:28px var(--pad) 40px}
+  .deck{flex-direction:column;width:100%;max-width:420px}
+  .deck__l,.deck__r{width:100%;height:auto}
+  .deck__l-in{padding:20px 18px}
+  .deck__l-in p{font-size:14px;line-height:1.45}
+  .deck__r{padding:18px 18px 22px;min-height:150px;justify-content:flex-end}
+  .deck__r h4{font-size:24px;line-height:28px}
+  .can{padding:80px var(--pad) 120px}
+  .can__list{margin:20px 0 0}
+  .can__item{font-size:34px;line-height:40px;height:40px;margin-bottom:8px;letter-spacing:-1px}
+  .can__item .roll{height:40px}
+  .can__item .roll span{line-height:40px}
+  .lwt__img{height:112vw}
+  .lwt__words{top:30vw;font-size:14vw}
+  .lwt__words .l1 .w:first-child{left:6vw}
+  .lwt__words .l1 .w:last-child{left:48vw}
+  .lwt__words .l2{padding-left:18vw;margin-top:8vw}
+  .end{padding-top:40px}
+  .end__p{font-size:20px;line-height:26px;margin-top:20px}
+  .btn-pill{margin-top:40px;height:42px}
+  .more{padding:64px 0 0}
+  .socials{flex-direction:column;gap:18px;margin-top:36px}
+  .social{font-size:28px}
+  .social svg{width:28px;height:28px}
+  .footer{height:640px}
+  .footer .shader{height:420px}
+  .footer__top{top:auto;bottom:56px;right:var(--pad)}
+  .footer__links{top:auto;bottom:110px;gap:12px}
+  .footer__copy{top:auto;bottom:56px}
+  .page-title{padding-top:130px}
+  .ab-intro{grid-template-columns:1fr;padding-top:120px}
+  .ab-intro p{font-size:19px}
+  .ab-word{padding-top:60px}
+  .sheet{margin:80px auto 140px}
+  .sheet__name .disp{font-size:22px}
+  .sheet__stats{flex-wrap:wrap}
+  .pd{padding-top:120px}
+  .pd__word{font-size:12vw}
+  .pd__meta{grid-template-columns:1fr 1fr}
+  .pd__body{grid-template-columns:1fr;row-gap:16px;margin-top:48px}
+  .pd__body li{font-size:20px;line-height:26px}
+  .pq__word{font-size:22vw}
+  .modal__box{grid-template-columns:1fr;gap:18px}
+  .modal__box h3{font-size:26px}
+}
+
+/* short landscape phones */
+@media (max-height:500px) and (orientation:landscape){
+  .hero{min-height:420px}
+  .hero__title{top:24vh}
+}

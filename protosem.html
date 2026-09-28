@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ProtoSem — Siva Jayasimhan G</title>
+<meta name="description" content="Siva Jayasimhan G — Mechatronics Engineering student at Kumaraguru College of Technology.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23000'/><text x='16' y='23' font-family='Arial' font-weight='900' font-size='18' text-anchor='middle' fill='%23F2F0EF'>SJ</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>if("scrollRestoration" in history)history.scrollRestoration="manual";</script>
+<link rel="stylesheet" href="css/style.css?v=1790315459">
+<link rel="stylesheet" href="css/responsive.css?v=1790315459">
+<link rel="stylesheet" href="css/fixes.css?v=1790315459">
+<link rel="stylesheet" href="css/protosem.css?v=1790315459"></head>
+<body class="">
+<div class="cursor"><div class="cursor__dot"></div><div class="cursor__pill">View</div></div>
+<div class="card__link-hint"></div>
+<!-- NAV -->
+<nav class="nav" id="nav" data-always>
+  <a href="index.html" class="nav__logo disp" data-glyph>Siva</a>
+  <span class="nav__spacer"></span>
+  <a href="about.html" class="mono nav__hide-m"><span class="roll"><span>//Bout Me</span><span>//Bout Me</span></span></a>
+  <a href="projects.html" class="mono nav__hide-m"><span class="roll"><span>Projects</span><span>Projects</span></span></a>
+  <a href="protosem.html" class="mono nav__hide-m"><span class="roll"><span>Protosem</span><span>Protosem</span></span></a>
+  <div class="nav__time mono nav__hide-m"><span class="bullet"></span><span data-day>SAT</span>&nbsp;<span class="colon">:</span>&nbsp;<span data-hh>00</span>:<span data-mm>00</span></div>
+  <button class="nav__menu-btn mono" style="background:none;border:0;color:inherit"><span>MENU</span></button>
+</nav>
+<div class="mnav">
+  <a href="index.html" class="disp">Home</a><a href="about.html" class="disp">//Bout Me</a><a href="projects.html" class="disp">Projects</a><a href="protosem.html" class="disp">Protosem</a>
+</div>
+
+<main>
+
+<section class="ps-title glowed">
+  <canvas class="shader page-glow" aria-hidden="true"></canvas>
+  <h1 class="stitle__word disp t-protosem" data-glyph>Protosem</h1>
+  <div class="stitle__subs mono muted"><span>Engineering</span><span>Journal</span><span>[22]</span><span>Weeks</span></div>
+</section>
+<section class="ps-railwrap" aria-label="Jump to a week">
+  <div class="ps-railhead"><span class="mono muted">[ Jump to week ]</span>
+    <div class="ps-arrows"><button class="ps-arrow" id="railPrev" type="button" aria-label="Scroll weeks left"><svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5"/></svg></button><button class="ps-arrow" id="railNext" type="button" aria-label="Scroll weeks right"><svg viewBox="0 0 14 14"><path d="M5 2l5 5-5 5"/></svg></button></div></div>
+  <div class="rail" id="rail" data-lenis-prevent></div>
+</section>
+<section class="ps-list" id="wlist" aria-label="All weeks"></section>
+<div class="wk" id="wk" role="dialog" aria-modal="true" aria-label="Week entry">
+  <div class="wk__bar">
+    <div class="wk__top"><span class="mono" id="wkCount">00 / 21</span>
+      <div class="wk__nav"><button class="ps-arrow" id="wkPrev" type="button" aria-label="Previous week"><svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5"/></svg></button><button class="ps-arrow" id="wkNext" type="button" aria-label="Next week"><svg viewBox="0 0 14 14"><path d="M5 2l5 5-5 5"/></svg></button>
+        <button class="ps-arrow wk__x" id="wkClose" type="button" aria-label="Close week (Esc)" data-cursor="Close"><svg viewBox="0 0 14 14"><path d="M2.5 2.5l9 9M11.5 2.5l-9 9"/></svg></button></div></div>
+    <div class="rail wk__rail" id="wkRail" data-lenis-prevent></div>
+  </div>
+  <div class="wk__scroll" id="wkScroll" data-lenis-prevent><div class="wk__inner" id="wkInner"></div></div>
+</div>
+<div class="lb" id="lb" role="dialog" aria-label="Image viewer"><button class="lb__x mono" type="button">[Close]</button><img id="lbImg" alt=""><div class="lb__cap mono"><span id="lbCap"></span><span>[Click to close]</span></div></div>
+</main>
+<!-- FOOTER -->
+<footer class="footer">
+  <canvas class="shader"></canvas>
+  <div class="footer__inner">
+    <a href="#" class="footer__top mono" data-top><span class="roll"><span>Back To Top</span><span>Back!!!</span></span></a>
+    <div class="footer__links mono">
+      <a class="brk" href="about.html"><span class="b">[</span><span class="roll"><span>/Bout Me</span><span>/Bout Me</span></span><span class="b">]</span></a>
+      <a class="brk" href="projects.html"><span class="b">[</span><span class="roll"><span>/ll Projects</span><span>/ll Projects</span></span><span class="b">]</span></a>
+      <a class="brk" href="mailto:jayasimhansiva@gmail.com"><span class="b">[</span><span class="roll"><span>Let's Connect</span><span>Let's Connect</span></span><span class="b">]</span></a>
+    </div>
+    <div class="footer__copy mono">©2026 Siva Jayasimhan G</div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Draggable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.4/dist/lenis.min.js"></script>
+<script src="js/main.js?v=1790315459"></script>
+<script src="js/weeks.js?v=1790315459"></script>
+<script>
+(() => {
+  const W = window.WEEKS, pad = n => String(n).padStart(2, '0');
+  const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+  const isWip = w => !!w.progress;
+
+  /* ---------- week rails (page + panel) ---------- */
+  const buildRail = rail => W.forEach(w => {
+    const b = el('button', 'chip' + (isWip(w) ? ' is-wip' : ''));
+    b.type = 'button'; b.dataset.week = w.n; b.setAttribute('data-cursor', 'Open');
+    b.append(el('span', 'dot'), el('span', '', 'Week ' + pad(w.n)));
+    b.addEventListener('click', () => openWeek(w.n));
+    rail.append(b);
+  });
+  const pageRail = document.getElementById('rail'), panelRail = document.getElementById('wkRail');
+  buildRail(pageRail); buildRail(panelRail);
+
+  /* ---------- week list ---------- */
+  const list = document.getElementById('wlist');
+  W.forEach(w => {
+    const b = el('button', 'wrow' + (isWip(w) ? ' is-wip' : ''));
+    b.type = 'button'; b.dataset.week = w.n; b.setAttribute('data-cursor', 'Open');
+    const t = isWip(w) ? 'Entry in progress' : w.title;
+    const col = el('div', 'wrow__c');
+    const title = el('div', 'wrow__t'); const roll = el('span', 'roll'); roll.append(el('span', '', t), el('span', '', t)); title.append(roll);
+    col.append(title, el('div', 'wrow__s mono', isWip(w) ? 'Check back soon' : (w.subtitle || '')));
+    const end = el('div', 'wrow__e mono', isWip(w) ? '[ In progress ]' : '[ Open ]'); end.append(el('span', 'wrow__arrow', '→'));
+    b.append(el('div', 'wrow__n mono', 'Week ' + pad(w.n)), col, end);
+    b.addEventListener('click', () => openWeek(w.n));
+    list.append(b);
+  });
+
+  /* ---------- rail arrows ---------- */
+  const scrollRail = dir => pageRail.scrollBy({ left: dir * pageRail.clientWidth * .7, behavior: 'smooth' });
+  document.getElementById('railPrev').onclick = () => scrollRail(-1);
+  document.getElementById('railNext').onclick = () => scrollRail(1);
+
+  /* ---------- panel ---------- */
+  const panel = document.getElementById('wk'), inner = document.getElementById('wkInner'), scroller = document.getElementById('wkScroll');
+  const counter = document.getElementById('wkCount');
+  let current = null, savedY = 0;
+
+  const figure = m => {
+    const f = el('figure', 'mfig');
+    if (m.type === 'video') {
+      const v = el('video'); v.controls = true; v.playsInline = true; v.preload = 'none';
+      if (m.poster) v.poster = m.poster; v.src = m.src; v.setAttribute('aria-label', m.title);
+      f.append(v);
+    } else {
+      const i = el('img'); i.src = m.src; i.alt = m.title; i.loading = 'lazy'; i.decoding = 'async';
+      i.setAttribute('data-cursor', 'View'); i.addEventListener('click', () => openLb(m)); f.append(i);
+    }
+    const c = el('figcaption'); c.append(el('b', '', m.title)); if (m.caption) c.append(document.createTextNode(' — ' + m.caption)); f.append(c);
+    return f;
+  };
+  const block = (label, body) => { const b = el('div', 'blk'); b.append(el('div', 'blk__label mono', label)); const bd = el('div', 'blk__body'); body(bd); b.append(bd); return b; };
+  const paras = arr => bd => arr.forEach(p => bd.append(el('p', '', p)));
+  const olist = arr => bd => { const ol = el('ol', 'olist'); arr.forEach(x => ol.append(el('li', '', x))); bd.append(ol); };
+
+  function render(w) {
+    inner.textContent = '';
+    const parts = [];
+    if (isWip(w)) {
+      const d = el('div', 'wip');
+      d.append(el('div', 'mono', '[ Week ' + pad(w.n) + ' ]'), el('h2', 'wip__word disp', 'Entry in progress'));
+      parts.push(d);
+    } else {
+      parts.push(el('div', 'wk__eyebrow mono', '[ Week ' + pad(w.n) + ' ]  ·  ProtoSem Journal'));
+      parts.push(el('h2', 'wk__h', w.title));
+      if (w.subtitle) parts.push(el('div', 'wk__sub mono', w.subtitle));
+      if (w.overview.length) parts.push(block('Overview', paras(w.overview)));
+      if (w.objectives.length) parts.push(block('Objectives', olist(w.objectives)));
+      if (w.activities.length) parts.push(block('Activities', olist(w.activities)));
+      if (w.tasks && w.tasks.length) parts.push(block('Tasks', bd => {
+        const wrap = el('div', 'tasklist');
+        w.tasks.forEach(t => {
+          const a = el('a', 'wrow'); a.href = 'week-' + w.n + '-task-' + t.n + '.html'; a.setAttribute('data-cursor', 'Open');
+          const col = el('div', 'wrow__c'), title = el('div', 'wrow__t'), roll = el('span', 'roll');
+          roll.append(el('span', '', t.title), el('span', '', t.title)); title.append(roll);
+          col.append(title, el('div', 'wrow__s mono', t.sub));
+          const end = el('div', 'wrow__e mono', '[ Open ]'); end.append(el('span', 'wrow__arrow', '\u2192'));
+          a.append(el('div', 'wrow__n mono', 'Task ' + pad(t.n)), col, end); wrap.append(a);
+          a.addEventListener('click', () => { try { sessionStorage.setItem('sj-wk-return', JSON.stringify({ w: w.n, y: scroller.scrollTop, p: savedY })); } catch (e) {} });
+        });
+        bd.append(wrap);
+      }));
+      if (w.sections.length) parts.push(block(w.tasks ? 'Beyond the Tasks' : 'Sessions', bd => {
+        const wrap = el('div', 'tasks');
+        w.sections.forEach((s, i) => {
+          const card = el('article', 'tcard'), inn = el('div', 'tcard__in');
+          inn.append(el('div', 'tcard__k', pad(i + 1) + ' / ' + pad(w.sections.length)), el('h3', 'tcard__t', s.title));
+          if (s.description) inn.append(el('p', 'tcard__d', s.description));
+          if (s.items) { const g = el('div', 'prin'); s.items.forEach(p => { const d = el('div'); d.append(el('b', '', p.en), el('i', '', p.jp), el('span', '', p.desc)); g.append(d); }); inn.append(g); }
+          if (s.media && s.media.length) { const g = el('div', 'tmedia' + (s.media.length === 1 ? ' one' : '')); s.media.forEach(m => g.append(figure(m))); inn.append(g); }
+          card.append(inn); wrap.append(card);
+        });
+        bd.append(wrap);
+      }));
+      if (w.gallery && w.gallery.length) parts.push(block((w.galleryMeta && w.galleryMeta.title) || 'Gallery', bd => { const g = el('div', 'tmedia'); w.gallery.forEach(m => g.append(figure(m))); bd.append(g); }));
+      if (w.reflection.length) parts.push(block('Reflection', paras(w.reflection)));
+      if (w.notes.length) parts.push(block('Notes', olist(w.notes)));
+    }
+    parts.forEach((p, i) => { p.style.setProperty('--i', Math.min(i, 8)); inner.append(p); });
+  }
+
+  function setActive(n, instant) {
+    [pageRail, panelRail].forEach(r => r.querySelectorAll('.chip').forEach(c => c.classList.toggle('is-active', +c.dataset.week === n)));
+    const c = panelRail.querySelector(`[data-week="${n}"]`);
+    if (c) panelRail.scrollTo({ left: c.offsetLeft - panelRail.clientWidth / 2 + c.offsetWidth / 2, behavior: instant ? 'auto' : 'smooth' });
+    counter.textContent = pad(n) + ' / ' + pad(W.length - 1);
+  }
+
+  function openWeek(n) {
+    const w = W.find(x => x.n === n); if (!w) return;
+    const wasOpen = panel.classList.contains('open');
+    let ret = null;                                          /* coming back from a task page: same spot, no animation */
+    try { const r = JSON.parse(sessionStorage.getItem('sj-wk-return') || 'null'); if (r && r.w === n && !wasOpen) { ret = r; sessionStorage.removeItem('sj-wk-return'); } } catch (e) {}
+    const swap = () => {
+      inner.querySelectorAll('video').forEach(v => v.pause());
+      render(w); scroller.scrollTop = ret ? ret.y : 0; setActive(n, !wasOpen); current = n;
+      const show = () => panel.classList.add('shown');
+      requestAnimationFrame(() => requestAnimationFrame(show));
+      setTimeout(show, 80);                                   /* backup when rAF is paused */
+      setTimeout(() => { if (getComputedStyle(inner.firstElementChild || inner).opacity === '0') panel.classList.add('instant'); }, 1200);
+    };
+    if (wasOpen) { panel.classList.remove('shown'); setTimeout(swap, 180); }
+    else {
+      savedY = (typeof lenis !== 'undefined' && lenis) ? lenis.scroll : scrollY;     /* remember exactly where you were */
+      panel.classList.remove('instant');
+      if (ret) { savedY = ret.p; panel.classList.add('instant'); }
+      swap(); panel.classList.add('open'); document.documentElement.classList.add('wk-lock'); (typeof lenis !== 'undefined' && lenis) && lenis.stop();
+      /* safety net: if the browser didn't run the slide (background tab, throttled pane),
+         snap the panel fully into view so its controls are always reachable */
+      setTimeout(() => { if (panel.classList.contains('open') && getComputedStyle(panel).transform !== 'none') { panel.classList.add('instant'); panel.classList.add('shown'); } }, 1000);
+    }
+    history.replaceState(null, '', '#week-' + n);
+  }
+  function closeWeek() {
+    document.activeElement && document.activeElement.blur();
+    inner.querySelectorAll('video').forEach(v => v.pause());
+    panel.classList.remove('open', 'shown', 'instant'); document.documentElement.classList.remove('wk-lock');
+    history.replaceState(null, '', location.pathname);
+    /* return to the exact same scroll position you left from */
+    window.scrollTo(0, savedY);
+    if (typeof lenis !== 'undefined' && lenis) { lenis.start(); lenis.scrollTo(savedY, { immediate: true, force: true }); }
+    current = null;
+    pageRail.querySelectorAll('.chip').forEach(c => c.classList.remove('is-active'));
+  }
+  const step = d => { if (current === null) return; const n = Math.min(W.length - 1, Math.max(0, current + d)); if (n !== current) openWeek(n); };
+  document.getElementById('wkClose').onclick = closeWeek;
+  document.getElementById('wkPrev').onclick = () => step(-1);
+  document.getElementById('wkNext').onclick = () => step(1);
+
+  /* ---------- image viewer ---------- */
+  const lb = document.getElementById('lb'), lbImg = document.getElementById('lbImg'), lbCap = document.getElementById('lbCap');
+  function openLb(m) { lbImg.src = m.src; lbImg.alt = m.title; lbCap.textContent = m.title; lb.classList.add('open'); }
+  const closeLb = () => lb.classList.remove('open');
+  lb.addEventListener('click', closeLb);
+
+  addEventListener('keydown', e => {
+    if (lb.classList.contains('open')) { if (e.key === 'Escape') closeLb(); return; }
+    if (current === null) return;
+    if (e.key === 'Escape') closeWeek();
+    else if (e.key === 'ArrowRight') step(1);
+    else if (e.key === 'ArrowLeft') step(-1);
+  });
+
+  /* deep link: protosem.html#week-7 */
+  const fromHash = () => { const hm = location.hash.match(/week-(\d+)/); if (hm && +hm[1] !== current) openWeek(+hm[1]); };
+  setTimeout(fromHash, 350);
+  addEventListener('hashchange', fromHash);
+})();
+</script>
+
+</body>
+</html>

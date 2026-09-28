@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Task 1 — Browser-Controlled LED (HTTP Web Server) — Siva Jayasimhan G</title>
+<meta name="description" content="Week 7, Task 1 of my ProtoSem journal: Browser-Controlled LED (HTTP Web Server). Terms explained, a beginner step-by-step guide, and how my build went.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23000'/><text x='16' y='23' font-family='Arial' font-weight='900' font-size='18' text-anchor='middle' fill='%23F2F0EF'>SJ</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>if("scrollRestoration" in history)history.scrollRestoration="manual";</script>
+<link rel="stylesheet" href="css/style.css?v=1790315459">
+<link rel="stylesheet" href="css/responsive.css?v=1790315459">
+<link rel="stylesheet" href="css/fixes.css?v=1790315459">
+<link rel="stylesheet" href="css/protosem.css?v=1790315459"><link rel="stylesheet" href="css/task.css?v=1790315459"></head>
+<body class="">
+<div class="cursor"><div class="cursor__dot"></div><div class="cursor__pill">View</div></div>
+<div class="card__link-hint"></div>
+<!-- NAV -->
+<nav class="nav" id="nav" data-always>
+  <a href="index.html" class="nav__logo disp" data-glyph>Siva</a>
+  <span class="nav__spacer"></span>
+  <a href="about.html" class="mono nav__hide-m"><span class="roll"><span>//Bout Me</span><span>//Bout Me</span></span></a>
+  <a href="projects.html" class="mono nav__hide-m"><span class="roll"><span>Projects</span><span>Projects</span></span></a>
+  <a href="protosem.html" class="mono nav__hide-m"><span class="roll"><span>Protosem</span><span>Protosem</span></span></a>
+  <div class="nav__time mono nav__hide-m"><span class="bullet"></span><span data-day>SAT</span>&nbsp;<span class="colon">:</span>&nbsp;<span data-hh>00</span>:<span data-mm>00</span></div>
+  <button class="nav__menu-btn mono" style="background:none;border:0;color:inherit"><span>MENU</span></button>
+</nav>
+<div class="mnav">
+  <a href="index.html" class="disp">Home</a><a href="about.html" class="disp">//Bout Me</a><a href="projects.html" class="disp">Projects</a><a href="protosem.html" class="disp">Protosem</a>
+</div>
+
+<main data-week="7" data-task="1">
+
+<section class="ps-title tk-title glowed">
+  <canvas class="shader page-glow" aria-hidden="true"></canvas>
+  <h1 class="stitle__word disp t-task" data-glyph>Task 01</h1>
+  <div class="stitle__subs mono muted"><span>Week 07</span><span>ProtoSem</span><span>Task 1 of 4</span><span>ESP32</span></div>
+</section>
+<section class="tk-head">
+  <a class="tk-back mono" href="protosem.html#week-7" data-cursor="Back"><span>←</span>Week 07 · ProtoSem Journal</a>
+  <h2 class="tk-h">Browser-Controlled LED (HTTP Web Server)</h2>
+  <div class="tk-sub mono">ESP32 HTTP web server, WiFi client, GPIO2 control</div>
+  <div class="tk-meta pd__meta"><div><div class="mono">Board</div><div class="mono">ESP32</div></div><div><div class="mono">Protocol</div><div class="mono">HTTP over WiFi</div></div><div><div class="mono">Output</div><div class="mono">Built-in LED · GPIO2</div></div><div><div class="mono">Logic</div><div class="mono">Active HIGH · 3.3V</div></div></div>
+</section>
+<section class="ps-railwrap tk-rail" aria-label="On this page">
+  <div class="ps-railhead tk-bar">
+    <a class="tk-pill tk-pill--week mono" href="protosem.html#week-7" data-cursor="Back"><span aria-hidden="true">←</span>Week 07</a>
+    <span class="tk-bar__count mono muted">01 / 04</span>
+    <div class="tk-bar__nav"><span class="tk-pill tk-pill--off mono" aria-disabled="true"><span aria-hidden="true">←</span>Prev</span><a class="tk-pill mono" href="week-7-task-2.html" rel="next" data-cursor="Task 02" aria-label="Next task: Task 2">Next<span aria-hidden="true">→</span></a></div>
+  </div>
+  <div class="rail" id="tkRail" data-lenis-prevent></div>
+</section>
+<div class="tk-body" id="tkBody"></div>
+<section class="tk-next" aria-label="More tasks"><div class="mono tk-next__k">[ Keep going ]</div><a class="wrow" href="week-7-task-2.html" data-cursor="Open"><div class="wrow__n mono">Next · Task 02</div><div class="wrow__c"><div class="wrow__t"><span class="roll"><span>Cloud MQTT Dashboard &amp; 230V Relay Control</span><span>Cloud MQTT Dashboard &amp; 230V Relay Control</span></span></div><div class="wrow__s mono">Adafruit IO, 230V relay switching, high-voltage safety</div></div><div class="wrow__e mono">[ Open ]<span class="wrow__arrow">→</span></div></a><a class="wrow" href="protosem.html#week-7" data-cursor="Open"><div class="wrow__n mono">Week 07</div><div class="wrow__c"><div class="wrow__t"><span class="roll"><span>All tasks in Week 07</span><span>All tasks in Week 07</span></span></div><div class="wrow__s mono">IoT &amp; Embedded Systems — ESP32 Smart Home Build</div></div><div class="wrow__e mono"><span class="wrow__arrow" style="margin:0 10px 0 0">←</span>[ Back ]</div></a></section>
+<div class="lb" id="lb" role="dialog" aria-label="Image viewer"><button class="lb__x mono" type="button">[Close]</button><img id="lbImg" alt=""><div class="lb__cap mono"><span id="lbCap"></span><span>[Click to close]</span></div></div>
+</main>
+<!-- FOOTER -->
+<footer class="footer">
+  <canvas class="shader"></canvas>
+  <div class="footer__inner">
+    <a href="#" class="footer__top mono" data-top><span class="roll"><span>Back To Top</span><span>Back!!!</span></span></a>
+    <div class="footer__links mono">
+      <a class="brk" href="about.html"><span class="b">[</span><span class="roll"><span>/Bout Me</span><span>/Bout Me</span></span><span class="b">]</span></a>
+      <a class="brk" href="projects.html"><span class="b">[</span><span class="roll"><span>/ll Projects</span><span>/ll Projects</span></span><span class="b">]</span></a>
+      <a class="brk" href="mailto:jayasimhansiva@gmail.com"><span class="b">[</span><span class="roll"><span>Let's Connect</span><span>Let's Connect</span></span><span class="b">]</span></a>
+    </div>
+    <div class="footer__copy mono">©2026 Siva Jayasimhan G</div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Draggable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.4/dist/lenis.min.js"></script>
+<script src="js/main.js?v=1790315459"></script>
+<script src="js/tasks.js?v=1790315459"></script>
+<script>
+(() => {
+  const main = document.querySelector('main'), body = document.getElementById('tkBody'), railBox = document.getElementById('tkRail');
+  const D = window.TASKS && TASKS[main.dataset.week] && TASKS[main.dataset.week][main.dataset.task];
+  if (!D || !body) return;
+  const pad = n => String(n).padStart(2, '0');
+  const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+
+  /* `code` and [label](https://link) inside a string */
+  const fmt = (parent, text) => {
+    text.split(/(`[^`]+`|\[[^\]]+\]\(https?:\/\/[^)\s]+\))/).forEach(p => {
+      if (!p) return;
+      if (p[0] === '`') parent.append(el('code', '', p.slice(1, -1)));
+      else if (p[0] === '[') {
+        const m = p.match(/^\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)$/);
+        if (!m) { parent.append(document.createTextNode(p)); return; }
+        const a = el('a', '', m[1]); a.href = m[2]; a.target = '_blank'; a.rel = 'noopener'; a.setAttribute('data-cursor', 'Open'); parent.append(a);
+      } else parent.append(document.createTextNode(p));
+    });
+    return parent;
+  };
+  const para = (t, cls) => fmt(el('p', cls || 'tk-t'), t);
+
+  /* ---------- reveal on scroll (CSS transition toggled by IntersectionObserver) ---------- */
+  const rvio = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); rvio.unobserve(e.target); } }), { rootMargin: '0px 0px -6% 0px' }) : null;
+  const rv = e => { e.classList.add('tk-rv'); rvio ? rvio.observe(e) : e.classList.add('in'); return e; };
+
+  /* ---------- building blocks ---------- */
+  const list = items => { const u = el('ul', 'tk-list'); items.forEach(t => u.append(fmt(el('li', 'tk-li'), t))); return u; };
+  const table = t => {
+    const w = el('div', 'tk-table'), tb = el('table'), th = el('thead'), hr = el('tr');
+    t.head.forEach(h => hr.append(el('th', '', h))); th.append(hr); tb.append(th);
+    const bd = el('tbody');
+    t.rows.forEach(r => { const tr = el('tr'); r.forEach((c, i) => { const td = el('td'); td.dataset.label = t.head[i]; fmt(td, c); tr.append(td); }); bd.append(tr); });
+    tb.append(bd); w.append(tb); return w;
+  };
+  const callout = (kind, label, items) => {
+    const c = el('div', 'callout callout--' + kind); c.append(el('span', 'callout__k', '[ ' + label + ' ]'));
+    if (items.length === 1) c.append(para(items[0], ''));
+    else c.append(list(items));
+    return c;
+  };
+  const expectBox = text => { const b = el('div', 'expect'); b.append(el('span', 'callout__k', '[ You should see ]'), el('pre', '', text)); return b; };
+
+  const copyText = async text => {
+    try { await navigator.clipboard.writeText(text); return true; }
+    catch (e) {
+      const t = el('textarea'); t.value = text; t.style.cssText = 'position:fixed;top:0;left:0;opacity:0'; t.setAttribute('readonly', ''); document.body.append(t); t.select();
+      let ok = false; try { ok = document.execCommand('copy'); } catch (x) {} t.remove(); return ok;
+    }
+  };
+  const codeBlock = c => {
+    const n = c.text.replace(/\n$/, '').split('\n').length;
+    const w = el('div', 'code' + (n > 34 ? ' is-clamped' : '')), bar = el('div', 'code__bar'), nm = el('span', 'code__name');
+    nm.append(el('b', '', c.name)); nm.append(el('span', 'code__lang', (c.lang ? ' · ' + c.lang : '') + (n > 12 ? ' · ' + n + ' lines' : '')));
+    const btn = el('button', 'code__copy', 'Copy'); btn.type = 'button'; btn.setAttribute('data-cursor', 'Copy'); btn.setAttribute('aria-label', 'Copy ' + c.name);
+    let tm = 0;
+    btn.addEventListener('click', async () => {
+      const ok = await copyText(c.text); btn.textContent = ok ? 'Copied' : 'Press Ctrl+C'; btn.classList.toggle('is-done', ok);
+      clearTimeout(tm); tm = setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('is-done'); }, 1800);
+    });
+    bar.append(nm, btn);
+    const bd = el('div', 'code__body'), pre = el('pre'), code = el('code', '', c.text.replace(/\n$/, ''));
+    pre.append(code); pre.tabIndex = 0; pre.setAttribute('aria-label', c.name); bd.append(pre);
+    const more = el('button', 'code__more', 'Show all ' + n + ' lines'); more.type = 'button'; more.setAttribute('data-cursor', 'Open');
+    more.addEventListener('click', () => { w.classList.remove('is-clamped'); if (window.ScrollTrigger) ScrollTrigger.refresh(); });
+    w.append(bar, bd, more); return w;
+  };
+
+  const step = (s, n) => {
+    const a = rv(el('article', 'stp')); a.append(el('div', 'stp__n mono', pad(n)));
+    const b = el('div', 'stp__b'); b.append(fmt(el('h4', 'stp__t'), s.t));
+    s.d.forEach(p => b.append(para(p)));
+    if (s.list) b.append(list(s.list));
+    if (s.table) b.append(table(s.table));
+    if (s.code) b.append(codeBlock(s.code));
+    (s.after || []).forEach(p => { const x = para(p); x.style.marginTop = '20px'; b.append(x); });
+    if (s.expect) b.append(expectBox(s.expect));
+    if (s.warn) b.append(callout('warn', 'Warning', s.warn));
+    if (s.tip) b.append(callout('tip', 'Tip', [s.tip]));
+    a.append(b); return a;
+  };
+
+  const figure = (m, n) => {
+    const f = el('figure', 'mfig');
+    if (m.type === 'video') {
+      const v = el('video'); v.controls = true; v.playsInline = true; v.preload = 'none';
+      if (m.poster) v.poster = m.poster; if (m.pw) v.style.aspectRatio = m.pw + ' / ' + m.ph; v.src = m.src; v.setAttribute('aria-label', m.title); f.append(v);
+    } else {
+      const i = el('img'); i.src = m.src; i.alt = m.title; i.loading = 'lazy'; i.decoding = 'async';
+      if (m.w) { i.width = m.w; i.height = m.h; }                     /* reserve the space: nothing jumps when it loads */
+      if (m.v) {
+        const base = m.src.replace(/\.\w+$/, '');
+        i.srcset = m.v.map(t => base + '-' + t + '.webp ' + t + 'w').concat(m.src + ' ' + m.w + 'w').join(', ');
+        i.sizes = n > 1 ? '(min-width:810px) 36vw, calc(100vw - 64px)' : '(min-width:810px) 36vw, calc(100vw - 64px)';
+      }
+      i.setAttribute('data-cursor', 'View'); i.addEventListener('click', () => openLb(m)); f.append(i);
+    }
+    const c = el('figcaption'); c.append(el('b', '', m.title)); if (m.caption) c.append(document.createTextNode(' — ' + m.caption)); f.append(c);
+    return f;
+  };
+
+  const blk = (id, num, label, content) => {
+    const s = el('section', 'tk-blk'); s.id = id;
+    const l = rv(el('div', 'tk-blk__label mono')); l.append(el('b', '', num), document.createTextNode('  ' + label));
+    const b = el('div', 'tk-blk__body'); content(b); s.append(l, b); return s;
+  };
+
+  /* ---------- one part = terms -> steps -> my build -> notes ---------- */
+  const multi = D.parts.length > 1, chips = [];
+  const buildPart = (P, prefix) => {
+    const frag = document.createDocumentFragment(), id = k => prefix + k;
+    if (multi) {
+      const h = rv(el('header', 'tk-part')); h.id = 'part-' + P.id.replace('.', '-');
+      h.append(el('div', 'tk-part__k mono', 'Part ' + P.id), el('h2', 'tk-part__t', P.title));
+      if (P.sub) h.append(el('div', 'tk-part__s mono', P.sub));
+      frag.append(h);
+      chips.push({ id: h.id, label: P.id + ' · ' + P.short });
+    }
+    frag.append(blk(id('what'), '01', 'What is what', b => {
+      const dl = el('dl', 'gloss');
+      P.terms.forEach(([t, d]) => { const r = rv(el('div', 'gloss__r')); r.append(el('dt', '', t), fmt(el('dd'), d)); dl.append(r); });
+      b.append(dl);
+    }));
+    let n = 0;
+    frag.append(blk(id('how'), '02', 'How to do it', b => {
+      P.guide.forEach(g => {
+        const grp = el('div', 'grp'), hd = rv(el('div', 'grp__h')), i = g.h.indexOf(' — ');
+        hd.append(el('span', 'mono', i > 0 ? g.h.slice(0, i) : ''), el('h3', '', i > 0 ? g.h.slice(i + 3) : g.h)); grp.append(hd);
+        g.steps.forEach(s => grp.append(step(s, ++n)));
+        b.append(grp);
+      });
+    }));
+    frag.append(blk(id('build'), '03', 'My build', b => {
+      const card = el('article', 'tcard tk-card'), inn = el('div', 'tcard__in');
+      inn.append(el('div', 'tcard__k', multi ? 'Task ' + P.id : 'Task ' + pad(D.n)));
+      P.story.forEach(t => inn.append(el('p', 'tcard__d', t)));
+      if (P.media.length) { const g = el('div', 'tmedia' + (P.media.length === 1 ? ' one' : '')); P.media.forEach(m => g.append(figure(m, P.media.length))); inn.append(g); }
+      card.append(inn); b.append(card);
+    }));
+    frag.append(blk(id('notes'), '04', 'Notes', b => {
+      const w = el('div', 'tk-notes'); P.notes.forEach(t => w.append(el('p', '', t))); b.append(w);
+    }));
+    return frag;
+  };
+  D.parts.forEach((P, i) => body.append(buildPart(P, multi ? 'p' + P.id.replace('.', '') + '-' : '')));
+  if (!multi) [['what', 'What is what'], ['how', 'How to do it'], ['build', 'My build'], ['notes', 'Notes']].forEach(([id, label]) => chips.push({ id, label }));
+
+  /* ---------- jump rail ---------- */
+  chips.forEach(c => {
+    const a = el('a', 'chip'); a.href = '#' + c.id; a.dataset.target = c.id; a.setAttribute('data-cursor', 'Jump');
+    a.append(el('span', 'dot'), el('span', '', c.label)); railBox.append(a);
+  });
+  const jump = (id, instant) => {
+    const t = document.getElementById(id); if (!t) return;
+    const y = t.getBoundingClientRect().top + (window.lenis ? lenis.scroll : scrollY) - (innerWidth < 810 ? 110 : Math.round(innerWidth / 1440 * 140));
+    if (window.lenis) lenis.scrollTo(y, instant ? { immediate: true, force: true } : { duration: 1.3 }); else scrollTo({ top: y, behavior: instant ? 'auto' : 'smooth' });
+  };
+  railBox.addEventListener('click', e => {
+    const a = e.target.closest('a[data-target]'); if (!a) return;
+    e.preventDefault(); jump(a.dataset.target); history.replaceState(null, '', '#' + a.dataset.target);
+  });
+  const targets = chips.map(c => document.getElementById(c.id)), links = [...railBox.children];
+  let spyTick = 0;
+  const spy = () => {
+    spyTick = 0; let cur = -1;
+    targets.forEach((t, i) => { if (t.getBoundingClientRect().top <= innerHeight * .34) cur = i; });
+    links.forEach((a, i) => a.classList.toggle('is-active', i === cur));
+    if (cur >= 0 && railBox.scrollWidth > railBox.clientWidth) { const a = links[cur]; railBox.scrollTo({ left: a.offsetLeft - railBox.clientWidth / 2 + a.offsetWidth / 2, behavior: 'auto' }); }
+  };
+  addEventListener('scroll', () => { if (!spyTick) spyTick = requestAnimationFrame(spy); }, { passive: true });
+  spy();
+
+  /* ---------- image viewer ---------- */
+  const lb = document.getElementById('lb'), lbImg = document.getElementById('lbImg'), lbCap = document.getElementById('lbCap');
+  function openLb(m) { lbImg.src = m.src; lbImg.alt = m.title; lbCap.textContent = m.title; lb.classList.add('open'); }
+  const closeLb = () => lb.classList.remove('open');
+  lb.addEventListener('click', closeLb);
+  addEventListener('keydown', e => { if (e.key === 'Escape' && lb.classList.contains('open')) closeLb(); });
+
+  /* decode photos a couple of screens before they arrive, so scrolling never pays for it */
+  if ('IntersectionObserver' in window) {
+    const dio = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return; dio.unobserve(e.target);
+      const i = e.target; i.loading = 'eager'; i.decode && i.decode().catch(() => {});
+    }), { rootMargin: '2200px 0px' });
+    document.querySelectorAll('.mfig img').forEach(i => dio.observe(i));
+  }
+
+  /* a black strip behind the nav once you scroll, so page text never runs under the menu */
+  const strip = () => document.body.classList.toggle('tk-scrolled', (window.lenis ? lenis.scroll : scrollY) > 24);
+  addEventListener('scroll', strip, { passive: true }); strip();
+
+  /* content was added after load: measure again, then honour a #link */
+  const settle = () => { window.ScrollTrigger && ScrollTrigger.refresh(); window.lenis && lenis.resize && lenis.resize(); };
+  requestAnimationFrame(() => { settle(); if (location.hash.length > 1) setTimeout(() => jump(decodeURIComponent(location.hash.slice(1)), true), 60); });
+  addEventListener('load', settle);
+})();
+</script>
+
+</body>
+</html>

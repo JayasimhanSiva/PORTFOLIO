@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Project — Siva Jayasimhan G</title>
+<meta name="description" content="Siva Jayasimhan G — Mechatronics Engineering student at Kumaraguru College of Technology.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23000'/><text x='16' y='23' font-family='Arial' font-weight='900' font-size='18' text-anchor='middle' fill='%23F2F0EF'>SJ</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>if("scrollRestoration" in history)history.scrollRestoration="manual";</script>
+<link rel="stylesheet" href="css/style.css?v=1790315459">
+<link rel="stylesheet" href="css/responsive.css?v=1790315459">
+<link rel="stylesheet" href="css/fixes.css?v=1790315459">
+</head>
+<body class="">
+<div class="cursor"><div class="cursor__dot"></div><div class="cursor__pill">View</div></div>
+<div class="card__link-hint"></div>
+<!-- NAV -->
+<nav class="nav" id="nav" data-always>
+  <a href="index.html" class="nav__logo disp" data-glyph>Siva</a>
+  <span class="nav__spacer"></span>
+  <a href="about.html" class="mono nav__hide-m"><span class="roll"><span>//Bout Me</span><span>//Bout Me</span></span></a>
+  <a href="projects.html" class="mono nav__hide-m"><span class="roll"><span>Projects</span><span>Projects</span></span></a>
+  <a href="protosem.html" class="mono nav__hide-m"><span class="roll"><span>Protosem</span><span>Protosem</span></span></a>
+  <div class="nav__time mono nav__hide-m"><span class="bullet"></span><span data-day>SAT</span>&nbsp;<span class="colon">:</span>&nbsp;<span data-hh>00</span>:<span data-mm>00</span></div>
+  <button class="nav__menu-btn mono" style="background:none;border:0;color:inherit"><span>MENU</span></button>
+</nav>
+<div class="mnav">
+  <a href="index.html" class="disp">Home</a><a href="about.html" class="disp">//Bout Me</a><a href="projects.html" class="disp">Projects</a><a href="protosem.html" class="disp">Protosem</a>
+</div>
+
+<main>
+
+<section class="pd">
+  <h1 class="pd__word disp" id="pdTitle"></h1>
+  <div class="pd__meta" id="pdMeta"></div>
+  <div class="pd__body"><div class="mono muted">Overview</div><ul id="pdList"></ul></div>
+</section>
+</main>
+<!-- FOOTER -->
+<footer class="footer">
+  <canvas class="shader"></canvas>
+  <div class="footer__inner">
+    <a href="#" class="footer__top mono" data-top><span class="roll"><span>Back To Top</span><span>Back!!!</span></span></a>
+    <div class="footer__links mono">
+      <a class="brk" href="about.html"><span class="b">[</span><span class="roll"><span>/Bout Me</span><span>/Bout Me</span></span><span class="b">]</span></a>
+      <a class="brk" href="projects.html"><span class="b">[</span><span class="roll"><span>/ll Projects</span><span>/ll Projects</span></span><span class="b">]</span></a>
+      <a class="brk" href="mailto:jayasimhansiva@gmail.com"><span class="b">[</span><span class="roll"><span>Let's Connect</span><span>Let's Connect</span></span><span class="b">]</span></a>
+    </div>
+    <div class="footer__copy mono">©2026 Siva Jayasimhan G</div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Draggable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.4/dist/lenis.min.js"></script>
+<script src="js/main.js?v=1790315459"></script>
+<script>
+const P = {
+  balaji: { t: "Balaji Engineering", img: "assets/intern-balaji.jpg", meta: [["Role", "Intern"], ["Year", "2025"], ["Type", "Plastic Moulding"], ["Focus", "Injection Moulding"]],
+    list: ["Gained hands-on exposure to injection moulding processes and plastic manufacturing workflows.", "Assisted in quality control inspections and material selection for production optimization.", "Worked with the engineering team to document process parameters and improve cycle efficiency."] },
+  maha: { t: "MAHA Precision Fit", img: "assets/intern-maha.jpg", meta: [["Role", "Engineering Intern"], ["Year", "2026"], ["Type", "Sheet Metal"], ["Focus", "Press Tools · QC · 5S"]],
+    list: ["Observed press tool manufacturing from die design and CNC/VMC machining to press operations, welding, and quality checking across 60-300 ton presses.", "Learned quality control using check fixtures, CMM reports, and dimensional inspection for Yamaha and Blue Star sheet metal components.", "Assisted in tool storage organization, recorded inspection data, and contributed to 5S activities in the press shop and tool room areas."] },
+  radar: { t: "Mini Radar", meta: [["Type", "Mini Project"], ["Board", "Arduino Uno"], ["Sensor", "Ultrasonic"], ["Domain", "Embedded · Sensing"]],
+    list: ["I built a mini radar system using an Arduino Uno and an ultrasonic sensor to detect objects based on distance.", "I programmed the system to continuously measure the surrounding distance and process the sensor data in real time.", "The readings were visualized in a radar-style interface to make object detection easier to understand.", "This project helped me strengthen my understanding of Arduino programming, sensors, data processing, and real-time visualization."] },
+  amplifier: { t: "Audio Amplifier", meta: [["Type", "Mini Project"], ["IC", "555 Timer"], ["Transistor", "BC547"], ["Domain", "Analog Electronics"]],
+    list: ["I built a basic audio amplifier using a 555 Timer IC and a BC547 transistor to understand the fundamentals of signal amplification.", "I worked with the circuit to generate and amplify an audio signal while observing how the components affected the output.", "This project gave me practical experience with transistors, timing circuits, signal flow, and basic electronics troubleshooting."] },
+  conveyor: { t: "Conveyor Belt", img: "assets/protosem/w/t4-2.webp", meta: [["Type", "Mini Project"], ["Control", "PWM"], ["Drive", "DC Motor"], ["Domain", "Automation"]],
+    list: ["A compact automation project designed to demonstrate variable speed control of a conveyor belt.", "A DC motor controlled through Pulse Width Modulation (PWM) lets the belt speed be adjusted smoothly for different operational requirements.", "Demonstrates DC motor control, PWM-based speed regulation, conveyor mechanisms and basic industrial automation concepts."] }
+};
+const id = new URLSearchParams(location.search).get('id') || 'conveyor', d = P[id] || P.conveyor;
+document.title = d.t + ' — Siva Jayasimhan G';
+const h = document.getElementById('pdTitle'); h.textContent = d.t; glyphify(h); h.setAttribute('data-fit', '.98'); fitAll();
+gsap.from(h.querySelectorAll('.ch'), { yPercent: 110, duration: 1.2, ease: 'expo.out', stagger: .035 });
+document.getElementById('pdMeta').innerHTML = d.meta.map(([k, v]) => `<div><div class="mono">${k}</div><div class="mono">${v}</div></div>`).join('');
+document.getElementById('pdList').innerHTML = d.list.map(x => `<li class="rv">${x}</li>`).join('');
+document.querySelectorAll('#pdList .rv').forEach((el, i) => gsap.to(el, { opacity: 1, y: 0, duration: 1, ease: 'expo.out', delay: i * .08, scrollTrigger: { trigger: el, start: 'top 92%' } }));
+</script>
+
+</body>
+</html>

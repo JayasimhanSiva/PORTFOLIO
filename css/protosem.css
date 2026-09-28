@@ -1,0 +1,163 @@
+/* ================= PROTOSEM — engineering journal =================
+   Built only from the site's existing tokens: Roboto Mono labels, Inter body,
+   display title, paper cards (#F2F0EF) from the project deck, --ease motion. */
+
+.ps-title{padding:calc(230 * var(--u)) var(--pad) 0}
+.ps-title .stitle__subs{grid-template-columns:repeat(4,1fr)}
+
+/* ---- week rail (sticky quick-jump) ---- */
+.ps-railwrap{position:sticky;top:calc(62 * var(--u));z-index:20;margin-top:calc(110 * var(--u));background:linear-gradient(180deg,#000 70%,rgba(0,0,0,0));padding:14px 0 18px}
+.ps-railhead{display:flex;justify-content:space-between;align-items:center;padding:0 var(--pad);margin-bottom:12px}
+.ps-arrows{display:flex;gap:8px}
+.ps-arrow{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:none;color:#fff;display:flex;align-items:center;justify-content:center;transition:background .35s var(--ease),color .35s var(--ease),border-color .35s}
+.ps-arrow:hover{background:#fff;color:#000;border-color:#fff}
+.ps-arrow svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.6}
+.rail{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;padding:2px var(--pad);scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.rail::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;scroll-snap-align:start;display:flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:60px;border:1px solid rgba(255,255,255,.22);background:transparent;color:var(--fg);font-family:var(--mono);font-size:max(11px,calc(13 * var(--u)));font-weight:500;letter-spacing:-.2px;text-transform:uppercase;white-space:nowrap;transition:background .4s var(--ease),color .4s var(--ease),border-color .4s var(--ease)}
+.chip .dot{width:6px;height:6px;border-radius:50%;background:#dc4a15;box-shadow:0 0 10px rgba(241,146,62,.6)}
+.chip.is-wip{color:rgba(255,255,255,.45)}
+.chip.is-wip .dot{background:transparent;border:1px solid rgba(255,255,255,.4);box-shadow:none}
+.chip:hover{border-color:#fff;color:#fff}
+.chip.is-active{background:#fff;color:#000;border-color:#fff}
+.chip.is-active .dot{background:#000;box-shadow:none;border-color:#000}
+
+/* ---- week list ---- */
+.ps-list{padding:calc(40 * var(--u)) var(--pad) calc(200 * var(--u))}
+.wrow{display:grid;grid-template-columns:calc(237 * var(--u)) 1fr auto;align-items:center;width:100%;text-align:left;background:none;border:0;border-top:1px solid rgba(255,255,255,.12);color:var(--fg);padding:calc(26 * var(--u)) 0;cursor:none;position:relative}
+.wrow:last-child{border-bottom:1px solid rgba(255,255,255,.12)}
+.wrow::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(220,74,21,.14),rgba(220,74,21,0) 60%);opacity:0;transition:opacity .5s var(--ease);pointer-events:none}
+.wrow:hover::before{opacity:1}
+.wrow__n{color:var(--muted)}
+.wrow__t{font-family:var(--sans);font-weight:500;font-size:max(20px,calc(40 * var(--u)));line-height:1.2;letter-spacing:-.02em;overflow:hidden;height:1.2em}
+.wrow__t .roll{height:1.2em}
+.wrow__t .roll span{line-height:1.2em}
+.wrow:hover .wrow__t .roll span{transform:translateY(-100%)}
+.wrow.is-wip .wrow__t{color:rgba(255,255,255,.38)}
+.wrow__s{color:var(--muted);text-align:right;padding-left:24px}
+.wrow.is-wip .wrow__s{color:rgba(255,255,255,.3)}
+.wrow__arrow{display:inline-block;margin-left:10px;transition:transform .5s var(--ease)}
+.wrow:hover .wrow__arrow{transform:translateX(6px)}
+
+/* ---- week panel (pop-up) ---- */
+.wk{position:fixed;inset:0;z-index:300;background:#000;transform:translate3d(0,100%,0);visibility:hidden;transition:transform .9s var(--ease),visibility 0s linear .9s;display:flex;flex-direction:column}
+.wk.open{transform:none;visibility:visible;transition:transform .9s var(--ease),visibility 0s}
+.wk__bar{flex:0 0 auto;border-bottom:1px solid rgba(255,255,255,.1);background:#000;padding-top:14px}
+.wk__top{display:flex;justify-content:space-between;align-items:center;padding:0 var(--pad) 12px}
+.wk__nav{display:flex;align-items:center;gap:14px}
+.wk__close{background:none;border:0;color:#fff}
+.wk__rail{padding-bottom:14px}
+.wk__rail .chip{height:32px;padding:0 12px}
+.wk__scroll{flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.wk__inner{padding:calc(90 * var(--u)) var(--pad) calc(160 * var(--u))}
+.wk__inner > *{opacity:0;transform:translate3d(0,24px,0);transition:opacity .8s var(--ease),transform .9s var(--ease);transition-delay:calc(var(--i,0) * 70ms + 250ms)}
+.wk.shown .wk__inner > *{opacity:1;transform:none}
+.wk__eyebrow{color:var(--muted)}
+.wk__h{font-family:var(--sans);font-weight:600;font-size:max(30px,calc(70 * var(--u)));line-height:1.05;letter-spacing:-.03em;margin-top:14px;max-width:calc(1100 * var(--u))}
+.wk__sub{margin-top:18px;color:var(--muted)}
+.blk{display:grid;grid-template-columns:calc(237 * var(--u)) 1fr;column-gap:0;margin-top:calc(110 * var(--u))}
+.blk__label{color:var(--muted);padding-top:6px}
+.blk__body{max-width:calc(900 * var(--u))}
+.blk__body p{font-family:var(--sans);font-weight:500;font-size:max(17px,calc(24 * var(--u)));line-height:1.4;letter-spacing:-.01em}
+.blk__body p + p{margin-top:1em}
+.olist{list-style:none;counter-reset:o}
+.olist li{counter-increment:o;display:grid;grid-template-columns:52px 1fr;padding:14px 0;border-top:1px solid rgba(255,255,255,.1);font-family:var(--sans);font-size:max(15px,calc(19 * var(--u)));line-height:1.45;color:#e9e6e4}
+.olist li:last-child{border-bottom:1px solid rgba(255,255,255,.1)}
+.olist li::before{content:counter(o,decimal-leading-zero);font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:3px}
+
+/* task cards: same paper card as the project deck */
+.tasks{display:flex;flex-direction:column;gap:calc(40 * var(--u))}
+.tcard{background:var(--paper);border-radius:8px;padding:8px}
+.tcard__in{border:1px solid #1b1b1b;border-radius:4px;padding:calc(34 * var(--u)) calc(34 * var(--u));display:grid;grid-template-columns:1fr;gap:18px}
+.tcard__k{font-family:var(--mono);font-size:12px;letter-spacing:-.2px;text-transform:uppercase;color:var(--stone)}
+.tcard__t{font-family:var(--sans);font-weight:600;font-size:max(22px,calc(32 * var(--u)));line-height:1.2;letter-spacing:-.02em;color:#000}
+.tcard__d{font-family:var(--sans);font-weight:500;font-size:max(15px,calc(17 * var(--u)));line-height:1.55;color:#111;max-width:980px}
+.prin{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:6px}
+.prin div{border:1px solid #1b1b1b;border-radius:4px;padding:14px}
+.prin b{display:block;font-family:var(--sans);font-weight:600;font-size:16px;color:#000}
+.prin i{display:block;font-style:normal;font-family:var(--mono);font-size:11px;text-transform:uppercase;color:var(--stone);margin:4px 0 8px}
+.prin span{font-family:var(--sans);font-size:13px;line-height:1.45;color:#222}
+.tmedia{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:6px}
+.tmedia.one{grid-template-columns:1fr}
+.mfig{margin:0;background:#0b0b0b;border-radius:4px;overflow:hidden;position:relative}
+.mfig img,.mfig video{display:block;width:100%;height:auto;background:#0b0b0b}
+.mfig img{cursor:none;transition:transform 1.2s var(--ease)}
+.mfig:hover img{transform:scale(1.03)}
+.mfig figcaption{background:var(--paper);color:#333;padding:10px 2px 2px;font-family:var(--mono);font-size:11px;line-height:1.5;letter-spacing:-.2px;text-transform:uppercase}
+.mfig figcaption b{color:#000;font-weight:500}
+
+/* entry in progress */
+.wip{min-height:calc(100vh - 200px);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:22px}
+.wip__word{font-size:min(9.5vw,150px);width:max-content}
+.wip .mono{color:var(--muted)}
+
+/* image viewer */
+.lb{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.94);display:flex;align-items:center;justify-content:center;padding:4vh 4vw;opacity:0;pointer-events:none;transition:opacity .45s var(--ease)}
+.lb.open{opacity:1;pointer-events:auto}
+.lb img{max-width:100%;max-height:86vh;width:auto;height:auto;border-radius:4px;transform:scale(.96);transition:transform .6s var(--ease)}
+.lb.open img{transform:none}
+.lb__cap{position:absolute;left:var(--pad);bottom:18px;right:var(--pad);display:flex;justify-content:space-between;color:#fff}
+.lb__x{position:absolute;top:18px;right:var(--pad);background:none;border:0;color:#fff}
+
+@media (max-width:809px){
+  .ps-title{padding-top:130px}
+  .ps-title .stitle__subs{grid-template-columns:repeat(4,1fr)}
+  .ps-railwrap{top:52px;margin-top:50px}
+  .chip{height:36px;padding:0 13px;font-size:11px}
+  .wrow{grid-template-columns:74px 1fr;padding:18px 0;row-gap:4px}
+  .wrow__s{grid-column:2;text-align:left;padding-left:0;font-size:10px}
+  .wrow__t{font-size:19px}
+  .wk__inner{padding:48px var(--pad) 120px}
+  .wk__h{font-size:30px}
+  .blk{grid-template-columns:1fr;row-gap:12px;margin-top:56px}
+  .blk__body p{font-size:17px}
+  .olist li{grid-template-columns:40px 1fr;font-size:15px}
+  .tcard__in{padding:20px 16px}
+  .tcard__t{font-size:21px}
+  .prin{grid-template-columns:1fr 1fr}
+  .tmedia{grid-template-columns:1fr}
+  .wip__word{font-size:13vw}
+}
+@media (prefers-reduced-motion:reduce){.wk,.wk__inner > *{transition:none}}
+
+/* long titles: ellipsis on desktop, full wrap on phones */
+.wrow__t .roll span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.wrow__t{min-width:0}
+@media (max-width:809px){
+  .wrow__t{height:auto;overflow:visible}
+  .wrow__t .roll{height:auto;overflow:visible}
+  .wrow__t .roll span{white-space:normal;transform:none!important}
+  .wrow__t .roll span + span{display:none}
+  .blk__body,.wk__h{max-width:none}
+}
+
+/* ===== week list v2: subtitle under the title, status column on the right ===== */
+.wrow{grid-template-columns:calc(237 * var(--u)) minmax(0,1fr) auto;column-gap:calc(24 * var(--u))}
+.wrow__c{min-width:0}
+.wrow__s{text-align:left;padding-left:0;margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wrow__e{color:var(--muted);white-space:nowrap}
+.wrow.is-wip .wrow__e{color:rgba(255,255,255,.3)}
+.wk__x svg{width:12px;height:12px}
+@media (max-width:809px){
+  .wrow{grid-template-columns:74px minmax(0,1fr);column-gap:0}
+  .wrow__e{display:none}
+  .wrow__s{white-space:normal}
+}
+.wrow:focus,.chip:focus,.ps-arrow:focus{outline:none}
+.wrow:focus-visible{outline:1px solid rgba(255,255,255,.35);outline-offset:-1px}
+.chip:focus-visible,.ps-arrow:focus-visible{outline:1px solid rgba(255,255,255,.6);outline-offset:2px}
+.wk.instant,.wk.instant .wk__inner > *{transition:none!important}
+.wk.instant.open{transform:none}
+
+/* ===== Week 7: the four tasks, each opening its own page ===== */
+a.wrow{text-decoration:none;color:var(--fg)}
+.tasklist .wrow{grid-template-columns:calc(112 * var(--u)) minmax(0,1fr) auto;column-gap:calc(20 * var(--u))}
+.tasklist .wrow__t{font-size:max(19px,calc(30 * var(--u)))}
+.tasklist .wrow:first-child{border-top:1px solid rgba(255,255,255,.12)}
+@media (max-width:809px){
+  .tasklist .wrow{grid-template-columns:74px minmax(0,1fr);column-gap:0}
+  .tasklist .wrow__t{font-size:19px}
+}
+
+/* "Entry in progress": wrap inside the screen instead of running off it */
+.wip__word{width:auto;max-width:100%;white-space:normal;text-wrap:balance}
