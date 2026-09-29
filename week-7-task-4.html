@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Task 4 — Forge: Web Dashboard — Siva Jayasimhan G</title>
-<meta name="description" content="Week 7, Task 4 of my ProtoSem journal: Forge: Web Dashboard. Terms explained, a beginner step-by-step guide, and how my build went.">
+<title>Task 4 — Forge: Sensors, Cloud & Dashboard — Siva Jayasimhan G</title>
+<meta name="description" content="Week 7, Task 4 of my ProtoSem journal: Forge: Sensors, Cloud &amp; Dashboard. Terms explained, a beginner step-by-step guide, and how my build went.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23000'/><text x='16' y='23' font-family='Arial' font-weight='900' font-size='18' text-anchor='middle' fill='%23F2F0EF'>SJ</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script>if("scrollRestoration" in history)history.scrollRestoration="manual";</script>
-<link rel="stylesheet" href="css/style.css?v=1790586442">
-<link rel="stylesheet" href="css/responsive.css?v=1790586442">
-<link rel="stylesheet" href="css/fixes.css?v=1790586442">
-<link rel="stylesheet" href="css/protosem.css?v=1790586442"><link rel="stylesheet" href="css/task.css?v=1790586442"></head>
+<link rel="stylesheet" href="css/style.css?v=1790653840">
+<link rel="stylesheet" href="css/responsive.css?v=1790653840">
+<link rel="stylesheet" href="css/fixes.css?v=1790653840">
+<link rel="stylesheet" href="css/protosem.css?v=1790653840"><link rel="stylesheet" href="css/task.css?v=1790653840"></head>
 <body class="">
 <div class="cursor"><div class="cursor__dot"></div><div class="cursor__pill">View</div></div>
 <div class="card__link-hint"></div>
@@ -35,13 +35,13 @@
 <section class="ps-title tk-title glowed">
   <canvas class="shader page-glow" aria-hidden="true"></canvas>
   <h1 class="stitle__word disp t-task" data-glyph>Task 04</h1>
-  <div class="stitle__subs mono muted"><span>Week 07</span><span>ProtoSem</span><span>Task 4 of 5</span><span>Dashboard</span></div>
+  <div class="stitle__subs mono muted"><span>Week 07</span><span>ProtoSem</span><span>Task 4 of 5</span><span>Forge</span></div>
 </section>
 <section class="tk-head">
   <a class="tk-back mono" href="protosem.html#week-7" data-cursor="Back"><span>←</span>Week 07 · ProtoSem Journal</a>
-  <h2 class="tk-h">Forge: Web Dashboard</h2>
-  <div class="tk-sub mono">HTML, CSS and JavaScript — a 3-page responsive web app for Forge</div>
-  <div class="tk-meta pd__meta"><div><div class="mono">Interface</div><div class="mono">3-page web dashboard</div></div><div><div class="mono">Tech</div><div class="mono">HTML · CSS · JavaScript</div></div><div><div class="mono">Pages</div><div class="mono">Landing · Login · Dashboard</div></div><div><div class="mono">Layout</div><div class="mono">Responsive · reduced-motion aware</div></div></div>
+  <h2 class="tk-h">Forge: Sensors, Cloud &amp; Dashboard</h2>
+  <div class="tk-sub mono">DHT11 + LDR sensors, Firebase Realtime Database, responsive web dashboard</div>
+  <div class="tk-meta pd__meta"><div><div class="mono">Sensors</div><div class="mono">DHT11 + LDR</div></div><div><div class="mono">Cloud</div><div class="mono">Firebase Realtime Database</div></div><div><div class="mono">Interface</div><div class="mono">3-page web dashboard</div></div><div><div class="mono">Output</div><div class="mono">Relay · CSV export</div></div></div>
 </section>
 <section class="ps-railwrap tk-rail" aria-label="On this page">
   <div class="ps-railhead tk-bar">
@@ -52,7 +52,7 @@
   <div class="rail" id="tkRail" data-lenis-prevent></div>
 </section>
 <div class="tk-body" id="tkBody"></div>
-<section class="tk-next" aria-label="More tasks"><div class="mono tk-next__k">[ Keep going ]</div><a class="wrow" href="week-7-task-3.html" data-cursor="Open"><div class="wrow__n mono">Previous · Task 03</div><div class="wrow__c"><div class="wrow__t"><span class="roll"><span>Google Assistant Voice Control via IFTTT</span><span>Google Assistant Voice Control via IFTTT</span></span></div><div class="wrow__s mono">IFTTT applets, webhooks, multi-platform chain</div></div><div class="wrow__e mono"><span class="wrow__arrow" style="margin:0 10px 0 0">←</span>[ Open ]</div></a><a class="wrow" href="week-7-task-5.html" data-cursor="Open"><div class="wrow__n mono">Next · Task 05</div><div class="wrow__c"><div class="wrow__t"><span class="roll"><span>Forge: Firebase &amp; Real-Time Integration</span><span>Forge: Firebase &amp; Real-Time Integration</span></span></div><div class="wrow__s mono">DHT11 + LDR sensors, Firebase Realtime Database, and live data arriving on the Task 4 dashboard</div></div><div class="wrow__e mono">[ Open ]<span class="wrow__arrow">→</span></div></a><a class="wrow" href="protosem.html#week-7" data-cursor="Open"><div class="wrow__n mono">Week 07</div><div class="wrow__c"><div class="wrow__t"><span class="roll"><span>All tasks in Week 07</span><span>All tasks in Week 07</span></span></div><div class="wrow__s mono">IoT &amp; Embedded Systems — ESP32 Smart Home Build</div></div><div class="wrow__e mono"><span class="wrow__arrow" style="margin:0 10px 0 0">←</span>[ Back ]</div></a></section>
+<section class="tk-next" aria-label="More tasks"><div class="mono tk-next__k">[ Keep going ]</div><a class="wrow" href="week-7-task-3.html" data-cursor="Open"><div class="wrow__n mono">Previous · Task 03</div><div class="wrow__c"><div class="wrow__t"><span class="roll"><span>Google Assistant Voice Control via IFTTT</span><span>Google Assistant Voice Control via IFTTT</span></span></div><div class="wrow__s mono">IFTTT applets, webhooks, multi-platform chain</div></div><div class="wrow__e mono"><span class="wrow__arrow" style="margin:0 10px 0 0">←</span>[ Open ]</div></a><a class="wrow" href="week-7-task-5.html" data-cursor="Open"><div class="wrow__n mono">Next · Task 05</div><div class="wrow__c"><div class="wrow__t"><span class="roll"><span>Forge: Real-Time Data on the Dashboard</span><span>Forge: Real-Time Data on the Dashboard</span></span></div><div class="wrow__s mono">Bringing the Task 4 build online and watching live sensor data, manual and automatic control, end-to-end proof</div></div><div class="wrow__e mono">[ Open ]<span class="wrow__arrow">→</span></div></a><a class="wrow" href="protosem.html#week-7" data-cursor="Open"><div class="wrow__n mono">Week 07</div><div class="wrow__c"><div class="wrow__t"><span class="roll"><span>All tasks in Week 07</span><span>All tasks in Week 07</span></span></div><div class="wrow__s mono">IoT &amp; Embedded Systems — ESP32 Smart Home Build</div></div><div class="wrow__e mono"><span class="wrow__arrow" style="margin:0 10px 0 0">←</span>[ Back ]</div></a></section>
 <div class="lb" id="lb" role="dialog" aria-label="Image viewer"><button class="lb__x mono" type="button">[Close]</button><img id="lbImg" alt=""><div class="lb__cap mono"><span id="lbCap"></span><span>[Click to close]</span></div></div>
 </main>
 <!-- FOOTER -->
@@ -73,8 +73,8 @@
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Draggable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.4/dist/lenis.min.js"></script>
-<script src="js/main.js?v=1790586442"></script>
-<script src="js/tasks.js?v=1790586442"></script>
+<script src="js/main.js?v=1790653840"></script>
+<script src="js/tasks.js?v=1790653840"></script>
 <script>
 (() => {
   const main = document.querySelector('main'), body = document.getElementById('tkBody'), railBox = document.getElementById('tkRail');
@@ -219,7 +219,13 @@
     return frag;
   };
   D.parts.forEach((P, i) => body.append(buildPart(P, multi ? 'p' + P.id.replace('.', '') + '-' : '')));
-  if (!multi) [['what', 'What is what'], ['how', 'How to do it'], ['build', 'My build'], ['notes', 'Notes']].forEach(([id, label]) => chips.push({ id, label }));
+  if (!multi) {
+    const solo = D.parts[0];
+    const base = [['what', 'What is what'], ['how', 'How to do it']];
+    if (solo.story.length || solo.media.length) base.push(['build', 'My build']);
+    if (solo.notes.length) base.push(['notes', 'Notes']);
+    base.forEach(([id, label]) => chips.push({ id, label }));
+  }
 
   /* ---------- jump rail ---------- */
   chips.forEach(c => {

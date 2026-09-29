@@ -441,13 +441,13 @@ window.WEEKS = [
    },
    {
     "n": 4,
-    "title": "Forge: Web Dashboard",
-    "sub": "HTML, CSS and JavaScript — a 3-page responsive web app for Forge"
+    "title": "Forge: Sensors, Cloud & Dashboard",
+    "sub": "4.1 Sensors · 4.2 Firebase backend · 4.3 Web dashboard"
    },
    {
     "n": 5,
-    "title": "Forge: Firebase & Real-Time Integration",
-    "sub": "5.1 Sensors · 5.2 Firebase backend · 5.3 Live data"
+    "title": "Forge: Real-Time Data on the Dashboard",
+    "sub": "Bringing the Task 4 build online and watching live sensor data, manual and automatic control, end-to-end proof"
    }
   ]
  },
