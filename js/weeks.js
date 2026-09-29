@@ -447,7 +447,7 @@ window.WEEKS = [
    {
     "n": 5,
     "title": "Forge: Real-Time Data on the Dashboard",
-    "sub": "Bringing the Task 4 build online and watching live sensor data, manual and automatic control, end-to-end proof"
+    "sub": "Bringing the Task 4 build online and watching your temperature, humidity and light numbers arrive live on the dashboard"
    }
   ]
  },
