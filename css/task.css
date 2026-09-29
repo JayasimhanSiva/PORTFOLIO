@@ -185,4 +185,4 @@ body.tk-scrolled::before{opacity:1}
 .tk-card .tmedia.one{grid-template-columns:repeat(2,1fr)}
 @media (max-width:809px){.tk-card .tmedia.one{grid-template-columns:1fr}}
 /* every video sits in the same 16:10 frame; a portrait clip is fitted inside it instead of towering over the page */
-.tk-card .mfig video{aspect-ratio:16 / 10!important;object-fit:contain;width:100%;height:auto}
+.tk-card .mfig video,.tk-card .mfig img{aspect-ratio:16 / 10!important;object-fit:contain;width:100%;height:auto;background:#0b0b0b;border-radius:4px}
