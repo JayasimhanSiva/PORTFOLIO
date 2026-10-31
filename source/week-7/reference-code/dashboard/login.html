@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Forge - Sign in</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="center">
+  <form id="form" class="panel" novalidate>
+    <h1>Sign in to Forge</h1>
+    <label>Email
+      <input id="email" type="email" autocomplete="email" required>
+    </label>
+    <label>Password
+      <input id="password" type="password" autocomplete="current-password" required minlength="6">
+    </label>
+    <p id="msg" class="msg" role="alert"></p>
+    <button class="btn" id="signin" type="submit">Sign in</button>
+    <button class="btn ghost" id="google" type="button">Continue with Google</button>
+  </form>
+
+  <script type="module">
+    import { auth } from "./firebase-config.js";
+    import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged }
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const $ = (id) => document.getElementById(id);
+    const msg = $("msg"), signin = $("signin"), google = $("google");
+
+    // already signed in? go straight to the dashboard
+    onAuthStateChanged(auth, (user) => { if (user) location.replace("dashboard.html"); });
+
+    const busy = (on) => { signin.disabled = google.disabled = on; signin.textContent = on ? "Signing in..." : "Sign in"; };
+    const friendly = (code) => ({
+      "auth/invalid-email": "That email address is not valid.",
+      "auth/invalid-credential": "Wrong email or password.",
+      "auth/user-not-found": "Wrong email or password.",
+      "auth/wrong-password": "Wrong email or password.",
+      "auth/too-many-requests": "Too many attempts. Wait a minute and try again.",
+      "auth/network-request-failed": "No connection. Check your internet and try again.",
+      "auth/popup-closed-by-user": "The Google window was closed before finishing."
+    })[code] || "Could not sign in. Please try again.";
+    const fail = (e) => { msg.textContent = friendly(e.code); busy(false); };
+
+    $("form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      msg.textContent = "";
+      const email = $("email").value.trim(), password = $("password").value;
+      if (!/^\S+@\S+\.\S+$/.test(email)) { msg.textContent = "Enter a valid email address."; return; }
+      if (password.length < 6) { msg.textContent = "The password is at least 6 characters."; return; }
+      busy(true);
+      signInWithEmailAndPassword(auth, email, password).catch(fail);   // success is handled by onAuthStateChanged
+    });
+
+    google.addEventListener("click", () => {
+      msg.textContent = "";
+      busy(true);
+      signInWithPopup(auth, new GoogleAuthProvider()).catch(fail);
+    });
+  </script>
+</body>
+</html>

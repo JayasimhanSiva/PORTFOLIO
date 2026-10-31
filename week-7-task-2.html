@@ -9,10 +9,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script>if("scrollRestoration" in history)history.scrollRestoration="manual";</script>
-<link rel="stylesheet" href="css/style.css?v=1791484697">
-<link rel="stylesheet" href="css/responsive.css?v=1791484697">
-<link rel="stylesheet" href="css/fixes.css?v=1791484697">
-<link rel="stylesheet" href="css/protosem.css?v=1791484697"><link rel="stylesheet" href="css/task.css?v=1791484697"></head>
+<link rel="stylesheet" href="css/style.css?v=1793442634">
+<link rel="stylesheet" href="css/responsive.css?v=1793442634">
+<link rel="stylesheet" href="css/fixes.css?v=1793442634">
+<link rel="stylesheet" href="css/protosem.css?v=1793442634"><link rel="stylesheet" href="css/task.css?v=1793442634"></head>
 <body class="">
 <div class="cursor"><div class="cursor__dot"></div><div class="cursor__pill">View</div></div>
 <div class="card__link-hint"></div>
@@ -73,8 +73,8 @@
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Draggable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.4/dist/lenis.min.js"></script>
-<script src="js/main.js?v=1791484697"></script>
-<script src="js/tasks.js?v=1791484697"></script>
+<script src="js/main.js?v=1793442634"></script>
+<script src="js/tasks.js?v=1793442634"></script>
 <script>
 (() => {
   const main = document.querySelector('main'), body = document.getElementById('tkBody'), railBox = document.getElementById('tkRail');
@@ -218,6 +218,19 @@
     }));
     return frag;
   };
+  if (D.brief) {
+    body.append(blk('report', '00', 'Report', b => {
+      D.brief.forEach(x => {
+        const g = el('div', 'stp__b tk-brief'), hd = rv(el('h4', 'stp__t', ''));
+        fmt(hd, x.h); g.append(hd);
+        x.d.forEach(t => g.append(para(t)));
+        if (x.list) g.append(list(x.list));
+        if (x.table) g.append(table(x.table));
+        b.append(g);
+      });
+    }));
+    chips.push({ id: 'report', label: 'Report' });
+  }
   D.parts.forEach((P, i) => body.append(buildPart(P, multi ? 'p' + P.id.replace('.', '') + '-' : '')));
   if (!multi) {
     const solo = D.parts[0];

@@ -188,3 +188,6 @@ body.tk-scrolled::before{opacity:1}
 .tk-card .mfig video,.tk-card .mfig img{aspect-ratio:16 / 10!important;object-fit:contain;width:100%;height:auto;background:#0b0b0b;border-radius:4px}
 .tk-card .tmedia>.mfig:last-child:nth-child(odd):not(:first-child){grid-column:1 / -1;width:calc(50% - 5px);justify-self:center}
 @media (max-width:809px){.tk-card .tmedia>.mfig:last-child:nth-child(odd):not(:first-child){width:100%}}
+.tk-brief{margin:0 0 44px}
+.tk-brief:last-child{margin-bottom:0}
+.tk-brief .tk-table,.tk-brief .tk-list{margin-top:14px}

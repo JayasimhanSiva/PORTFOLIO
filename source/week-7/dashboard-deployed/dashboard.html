@@ -1,0 +1,2672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<meta name="description" content="Smart Environment dashboard — live environmental monitoring and appliance control via Firebase and an ESP32.">
+<meta name="theme-color" content="#ffffff">
+<title>Dashboard — Smart Environment</title>
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="%230d1117"/><rect x="9" y="9" width="14" height="14" rx="3" fill="%23f5f5f7"/><circle cx="16" cy="16" r="4" fill="%230d1117"/></svg>'>
+<style>
+/* ==========================================================================
+   SMART ENVIRONMENT — control console
+   Light, monochrome, editorial. Real data only.
+   ========================================================================== */
+
+:root {
+    --page: #ffffff;
+    --band: #f5f5f7;
+    --ink: #000000;
+    --ink-2: #515154;
+    --ink-3: #86868c;
+    --line: #e8e8ed;
+    --line-strong: #c7c7cc;
+    --accent: #000000;
+    --accent-soft: rgba(0, 0, 0, 0.06);
+    --c-temp: #e0244d;
+    --c-hum: #2266cc;
+    --c-ldr: #7048e8;
+    --ok: #1e8e3e;
+    --ok-soft: rgba(30, 142, 62, 0.14);
+    --warn: #000000;
+    --warn-soft: rgba(0, 0, 0, 0.05);
+    --err: #000000;
+    --err-soft: rgba(0, 0, 0, 0.05);
+    --radius: 8px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+            "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Cascadia Code",
+            Consolas, "Liberation Mono", monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
+
+html { scroll-behavior: smooth; }
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+body {
+    margin: 0;
+    background: var(--page);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+::selection { background: rgba(0, 0, 0, 0.12); }
+
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+a { color: inherit; text-decoration: none; }
+
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* --------------------------------------------------------------------------
+   Dots, pills, sysrows
+   -------------------------------------------------------------------------- */
+
+.dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ink-3);
+    flex: none;
+}
+
+.dot--ok    { background: var(--ink); }
+.dot--warn  { background: transparent; }
+.dot--warn  { background: transparent; border: 1px solid var(--ink); }
+.dot--err   { background: var(--ink); box-shadow: 0 0 0 3px #fff, 0 0 0 1px var(--ink); }
+.dot--dim   { background: var(--ink-3); }
+.dot--accent{ background: var(--ink); }
+
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border: 1px solid var(--line-strong);
+    border-radius: 980px;
+    padding: 5px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    color: var(--ink-2);
+    background: #fff;
+}
+
+.pill--live   { color: #fff; border-color: var(--ink); background: var(--ink); }
+.pill--warn   { color: var(--ink); border-color: var(--line-strong); }
+.pill--danger { color: var(--ink); border-color: var(--ink); background: var(--band); }
+
+.sysrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--ink-2);
+    letter-spacing: 0.01em;
+}
+
+.sysrow__label { color: var(--ink-3); font-size: 12px; }
+.sysrow__text  { color: var(--ink); font-weight: 600; }
+
+/* --------------------------------------------------------------------------
+   Structure
+   -------------------------------------------------------------------------- */
+
+.wrap { max-width: 1160px; margin: 0 auto; padding: 0 28px; }
+
+/* --------------------------------------------------------------------------
+   Header
+   -------------------------------------------------------------------------- */
+
+.head {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(255, 255, 255, 0.86);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    backdrop-filter: saturate(1.4) blur(14px);
+    border-bottom: 1px solid var(--line);
+}
+
+.head__row {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 13px;
+    font-weight: 650;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+}
+
+.wordmark__mark {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: var(--ink);
+    display: grid;
+    place-items: center;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #fff;
+}
+
+.head__nav {
+    display: flex;
+    gap: 4px;
+    margin: 0 auto;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 4px 0;
+}
+
+.head__nav::-webkit-scrollbar { display: none; }
+
+.head__nav a {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--ink-2);
+    padding: 10px 14px;
+    border-radius: 8px;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.head__nav a:hover { background: rgba(29, 29, 31, 0.05); color: var(--ink); }
+.head__nav a:active { background: rgba(29, 29, 31, 0.1); }
+
+.head__nav a.is-active { color: var(--ink); font-weight: 600; background: rgba(29, 29, 31, 0.08); }
+
+.head__meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    white-space: nowrap;
+}
+
+.head__user {
+    font-size: 12px;
+    color: var(--ink-2);
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.link-btn {
+    appearance: none;
+    background: none;
+    border: none;
+    padding: 10px 14px;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-2);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+    min-height: 44px;
+    min-width: 44px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.link-btn:hover { color: var(--ink); background: var(--accent-soft); }
+.link-btn:active { background: var(--accent-soft); }
+
+@media (max-width: 760px) {
+    .head__row { gap: 12px; }
+    .head__nav a { padding: 8px 10px; font-size: 11px; }
+    .head__user { display: none; }
+    .link-btn { padding: 8px 10px; font-size: 12px; }
+}
+
+/* --------------------------------------------------------------------------
+   Boot screen
+   -------------------------------------------------------------------------- */
+
+.boot {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 20px;
+    color: var(--ink-2);
+    font-size: 14px;
+}
+
+.boot__mark {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--ink);
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.boot__spin {
+    width: 16px;
+    height: 16px;
+    margin: 4px auto 0;
+    border: 2px solid var(--line-strong);
+    border-top-color: var(--ink);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* --------------------------------------------------------------------------
+   Sections
+   -------------------------------------------------------------------------- */
+
+main { padding-bottom: 96px; }
+
+.sec {
+    padding: 88px 0 56px;
+    scroll-margin-top: 70px;
+    border-top: 1px solid var(--line);
+}
+
+.sec--tint { background: var(--page); }
+
+.sec__head { display: flex; align-items: baseline; gap: 18px; }
+
+.sec__no {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-3);
+    letter-spacing: 0.08em;
+}
+
+.sec__head h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.sec__sub {
+    margin: 8px 0 0;
+    font-size: 14px;
+    color: var(--ink-2);
+    max-width: 46em;
+}
+
+/* --------------------------------------------------------------------------
+   Callout
+   -------------------------------------------------------------------------- */
+
+.callout {
+    margin-top: 28px;
+    border: 1px solid var(--ink);
+    background: var(--band);
+    color: var(--ink-2);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    font-size: 13.5px;
+    line-height: 1.55;
+}
+
+.callout b { font-weight: 650; }
+
+/* --------------------------------------------------------------------------
+   NOW
+   -------------------------------------------------------------------------- */
+
+.now {
+    margin-top: 36px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    border-top: 1px solid var(--line);
+    padding-top: 30px;
+}
+
+.now__cell { border-left: 1px solid var(--line); padding-left: 20px; }
+
+.now__cell:first-child { border-left: none; padding-left: 0; }
+
+.now__label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+}
+
+.now__label .dot { margin-right: 6px; vertical-align: 1px; }
+
+.now__value {
+    margin-top: 10px;
+    font-size: clamp(44px, 6vw, 76px);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.now__unit {
+    font-size: 0.38em;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--ink-2);
+    margin-left: 4px;
+}
+
+.now__meta {
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--ink-3);
+}
+
+.status-strip {
+    margin-top: 48px;
+    border-top: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.status-cell {
+    padding: 14px 12px;
+    border-left: 1px solid var(--line);
+    min-width: 0;
+}
+
+.status-cell:first-child { border-left: none; padding-left: 0; }
+
+@media (max-width: 860px) {
+    .now { grid-template-columns: 1fr; gap: 16px; }
+    .now__cell { border-left: none; padding-left: 0; border-top: 1px solid var(--line); padding-top: 16px; }
+    .now__cell:first-child { border-top: none; padding-top: 0; }
+    .status-strip { grid-template-columns: repeat(2, 1fr); row-gap: 16px; }
+    .status-cell { border-left: none; padding: 0; border-top: 1px solid var(--line); padding-top: 12px; }
+    .status-cell:nth-child(-n+2) { border-top: none; padding-top: 0; }
+}
+
+@media (max-width: 420px) {
+    .status-strip { grid-template-columns: 1fr; }
+    .status-cell:nth-child(n+3) { border-top: 1px solid var(--line); padding-top: 12px; }
+}
+
+/* --------------------------------------------------------------------------
+   Instruments
+   -------------------------------------------------------------------------- */
+
+.instr-grid {
+    margin-top: 34px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.instr {
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+}
+
+.instr__label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+}
+
+.instr__value {
+    margin-top: 16px;
+    font-size: clamp(36px, 5vw, 64px);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.instr__unit { font-size: 0.42em; font-weight: 500; color: var(--ink-2); letter-spacing: 0; margin-left: 3px; }
+
+.instr__source { margin-top: 8px; font-size: 12px; color: var(--ink-3); }
+
+.stat-grid {
+    margin: 20px 0 0;
+    border-top: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.stat { padding-top: 12px; }
+
+.stat + .stat { border-left: 1px solid var(--line); padding-left: 14px; }
+
+.stat__k { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.stat__v { margin-top: 4px; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.range-track {
+    margin-top: 22px;
+    height: 1.5px;
+    background: var(--line);
+    border-radius: 2px;
+    position: relative;
+}
+
+.range-span {
+    position: absolute;
+    top: 0;
+    height: 1.5px;
+    background: var(--line-strong);
+}
+
+.range-mark {
+    position: absolute;
+    top: -4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--ink);
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px var(--line-strong);
+    transform: translateX(-50%);
+}
+
+.range-caption {
+    margin-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 10.5px;
+    color: var(--ink-3);
+    letter-spacing: 0.04em;
+}
+
+@media (max-width: 760px) { 
+    .instr-grid { grid-template-columns: 1fr; gap: 16px; }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); row-gap: 16px; }
+    .stat + .stat { border-left: none; padding-left: 0; border-top: 1px solid var(--line); padding-top: 12px; }
+    .stat:nth-child(-n+2) { border-top: none; padding-top: 0; }
+}
+
+/* --------------------------------------------------------------------------
+   Light
+   -------------------------------------------------------------------------- */
+
+.light-meter {
+    margin-top: 36px;
+    border-top: 1px solid var(--line);
+    padding-top: 34px;
+}
+
+.light-meter__top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.light-meter__value {
+    font-size: clamp(48px, 7vw, 88px);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+}
+
+.light-meter__value .unit { font-size: 0.4em; font-weight: 500; color: var(--ink-2); letter-spacing: 0; margin-left: 4px; }
+
+.light-meter__band { text-align: right; }
+
+.band-label {
+    font-size: 13px;
+    font-weight: 650;
+    letter-spacing: 0.1em;
+}
+
+.band-hint { margin-top: 4px; font-size: 12.5px; color: var(--ink-3); }
+
+.ldr-scale { margin-top: 30px; }
+
+.ldr-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--ink-3);
+    margin-bottom: 8px;
+}
+
+.ldr-track {
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(to right,
+        rgba(29,29,31,0.22), rgba(29,29,31,0.1),
+        rgba(29,29,31,0.22) 50%, rgba(29,29,31,0.55) 100%);
+    position: relative;
+}
+
+.ldr-thresh {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    width: 2px;
+    background: var(--accent);
+    opacity: 0.55;
+}
+
+.ldr-marker {
+    position: absolute;
+    top: -7px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--ink);
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 1px var(--ink);
+    transform: translateX(-50%);
+    transition: left 0.25s cubic-bezier(.2,.8,.2,1);
+}
+
+@media (prefers-reduced-motion: reduce) { .ldr-marker { transition: none; } }
+
+.ldr-ticks { position: relative; height: 18px; margin-top: 8px; }
+
+.ldr-tick {
+    position: absolute;
+    transform: translateX(-50%);
+    font-family: var(--mono);
+    font-size: 9px;
+    line-height: 1;
+    color: var(--ink-3);
+    white-space: nowrap;
+}
+
+.ldr-tick:first-child { transform: none; }
+.ldr-tick:last-child { transform: translateX(-100%); }
+
+@media (max-width: 560px) {
+    .light-meter__top { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .light-meter__band { text-align: left; }
+    .ldr-track { height: 10px; }
+    .ldr-marker { width: 26px; height: 26px; top: -9px; }
+    .ldr-tick { font-size: 9px; }
+}
+
+.col-temp { color: var(--c-temp); }
+.col-hum { color: var(--c-hum); }
+.col-ldr { color: var(--c-ldr); }
+.range-mark--temp { background: var(--c-temp); box-shadow: 0 0 0 1px var(--c-temp); }
+.range-mark--hum { background: var(--c-hum); box-shadow: 0 0 0 1px var(--c-hum); }
+
+/* --------------------------------------------------------------------------
+   Control
+   -------------------------------------------------------------------------- */
+
+.ctl { margin-top: 36px; }
+
+.ctl__left { border-top: 1px solid var(--line); padding-top: 30px; }
+.ctl__right { border-top: 1px solid var(--line); padding-top: 30px; }
+
+.ctl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+
+.ctl h3 {
+    margin: 0 0 6px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+.ctl__note { font-size: 12.5px; color: var(--ink-3); margin: 0 0 22px; }
+
+.seg {
+    display: inline-flex;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.seg button {
+    appearance: none;
+    border: none;
+    background: #fff;
+    padding: 14px 28px;
+    min-height: 48px;
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--ink-2);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.seg button + button { border-left: 1px solid var(--line-strong); }
+
+.seg button:hover:not(:disabled) { color: var(--ink); background: var(--band); }
+.seg button:active:not(:disabled) { background: var(--accent-soft); }
+.seg button.is-active { background: var(--ink); color: #fff; }
+.seg button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.tbtn-row {
+    margin-top: 22px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.tbtn {
+    appearance: none;
+    border: 1px solid var(--line-strong);
+    border-radius: 12px;
+    background: #fff;
+    padding: 26px 20px;
+    min-height: 64px;
+    font-family: var(--font);
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s, background 0.15s, transform 0.05s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.tbtn:hover:not(:disabled) { border-color: var(--ink); }
+.tbtn:active:not(:disabled) { transform: scale(0.985); }
+.tbtn:disabled { opacity: 0.45; cursor: not-allowed; }
+.tbtn.is-pressed { border-color: var(--ink); background: var(--band); }
+
+.tbtn b { display: block; font-size: 22px; font-weight: 650; letter-spacing: -0.01em; }
+.tbtn span { display: block; margin-top: 5px; font-size: 12px; color: var(--ink-3); font-weight: 500; }
+
+@media (max-width: 560px) {
+    .tbtn-row { grid-template-columns: 1fr; }
+    .seg { width: 100%; }
+    .seg button { flex: 1; text-align: center; }
+    .th-row { flex-direction: column; gap: 12px; }
+    .th-row > div { width: 100%; }
+}
+
+.ctl__state { margin-top: 24px; display: flex; align-items: center; gap: 12px; }
+
+.ctl__state .big { font-size: 15px; font-weight: 650; }
+
+.ctl__feedback {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: var(--radius);
+    background: var(--band);
+    border: 1px solid var(--line);
+    font-size: 12.5px;
+    color: var(--ink-2);
+}
+
+.th-field { width: 100%; }
+
+.th-field label { display: block; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; }
+
+.th-row { display: flex; gap: 10px; }
+
+.input {
+    flex: 1;
+    appearance: none;
+    background: #fff;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    font-family: var(--mono);
+    font-size: 15px;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+}
+
+.input:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.12); }
+
+.btn {
+    appearance: none;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 12px 22px;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.btn:hover:not(:disabled) { background: #2c2c2e; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+@media (max-width: 760px) { .ctl-grid { grid-template-columns: 1fr; } }
+
+/* --------------------------------------------------------------------------
+   Automation — typographic rule
+   -------------------------------------------------------------------------- */
+
+.rule {
+    margin-top: 40px;
+    border-top: 2px solid var(--ink);
+    padding-top: 30px;
+}
+
+.rule__line {
+    font-size: clamp(20px, 3vw, 30px);
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    font-weight: 600;
+}
+
+.rule__token { color: var(--ink-3); font-weight: 500; }
+
+.rule__val {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    border-bottom: 2px solid var(--ink);
+    padding: 0 2px;
+}
+
+.rule__val--accent { color: var(--accent); border-bottom-color: var(--accent); }
+
+.rule__arrow { font-weight: 400; color: var(--ink-2); }
+
+.rule__gap { margin-top: 18px; }
+
+.rule__eval {
+    margin-top: 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    font-size: 13.5px;
+}
+
+.rule__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    border: 1px solid var(--line-strong);
+    border-radius: 980px;
+    padding: 7px 14px;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+}
+
+.rule__detail { color: var(--ink-2); }
+
+/* --------------------------------------------------------------------------
+   Table
+   -------------------------------------------------------------------------- */
+
+.table-toolbar {
+    margin-top: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.table-toolbar p { margin: 0; font-size: 13px; color: var(--ink-2); }
+
+.table-wrap {
+    margin-top: 18px;
+    border-top: 1px solid var(--line);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+table { width: 100%; border-collapse: collapse; min-width: 680px; }
+
+th, td {
+    text-align: right;
+    padding: 14px 16px;
+    font-size: 13.5px;
+    border-bottom: 1px solid var(--line);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+th { color: var(--ink-3); font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; background: var(--page); position: sticky; top: 0; z-index: 1; }
+th:first-child, td:first-child { text-align: left; padding-left: 0; min-width: 160px; }
+th:last-child, td:last-child { padding-right: 0; }
+
+td.mono { font-family: var(--mono); font-size: 12.5px; color: var(--ink-2); }
+td.muted { color: var(--ink-2); }
+
+td.col-temp { color: var(--c-temp); font-weight: 550; }
+td.col-hum { color: var(--c-hum); font-weight: 550; }
+td.col-ldr { color: var(--c-ldr); font-weight: 550; }
+
+.text-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 650;
+    letter-spacing: 0.1em;
+    border-radius: 5px;
+    padding: 4px 8px;
+    border: 1px solid var(--line-strong);
+    color: var(--ink-2);
+}
+
+.text-badge--on { color: var(--ok); border-color: rgba(30,142,62,0.4); background: var(--ok-soft); }
+.text-badge--off { color: var(--ink-2); }
+.text-badge--auto { color: var(--c-ldr); border-color: rgba(112,72,232,0.4); background: rgba(112,72,232,0.08); }
+.text-badge--manual { color: var(--ink-2); }
+
+.table-empty td { text-align: center; color: var(--ink-3); padding: 34px 0; letter-spacing: 0.01em; text-transform: none; }
+
+@media (max-width: 560px) {
+    .table-toolbar { flex-direction: column; align-items: flex-start; }
+    .table-toolbar > span { width: 100%; text-align: right; }
+}
+
+/* --------------------------------------------------------------------------
+   Analytics
+   -------------------------------------------------------------------------- */
+
+.chart-grid {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 48px;
+}
+
+.chart-panel h3 {
+    margin: 0 0 4px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+.chart-panel .chart-cap { margin: 0 0 10px; font-size: 12.5px; color: var(--ink-3); }
+
+.chart-box {
+    position: relative;
+    height: 320px;
+    border-top: 1px solid var(--line);
+    padding-top: 18px;
+}
+
+.chart-empty {
+    margin-top: 40px;
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius);
+    padding: 26px 24px;
+    color: var(--ink-3);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-align: center;
+}
+
+.empty-note { border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 20px; font-size: 13px; color: var(--ink-2); margin-top: 34px; max-width: 44em; }
+
+@media (max-width: 560px) {
+    .chart-box { height: 280px; }
+    .chart-grid { gap: 36px; }
+}
+
+/* --------------------------------------------------------------------------
+   Documentation
+   -------------------------------------------------------------------------- */
+
+.docs { margin-top: 40px; }
+
+.doc-block { margin-bottom: 48px; }
+
+.doc-block h3 {
+    margin: 0 0 10px;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+.doc-block p, .doc-block li { font-size: 14.5px; line-height: 1.7; color: var(--ink-2); }
+.doc-block p { margin: 10px 0; max-width: 58em; }
+
+.doc-block ul, .doc-block ol { margin: 8px 0 10px; padding-left: 20px; max-width: 58em; }
+.doc-block li { margin-bottom: 6px; }
+
+.doc-block code {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    background: var(--band);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 2px 6px;
+    color: var(--ink);
+}
+
+.doc-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+.doc-table th { text-align: left; padding: 9px 10px; }
+.doc-table td { text-align: left; padding: 9px 10px; font-size: 13px; }
+
+.doc-empty {
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    color: var(--ink-3);
+    font-size: 13.5px;
+    margin-top: 14px;
+}
+
+.acc__item { border-bottom: 1px solid var(--line); }
+
+.acc__btn {
+    width: 100%;
+    appearance: none;
+    background: none;
+    border: none;
+    padding: 18px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--ink);
+    text-align: left;
+}
+
+.acc__btn .acc__ix { font-family: var(--mono); font-size: 12px; color: var(--ink-3); font-weight: 400; margin-right: 12px; }
+
+.acc__btn .acc__sign { transition: transform 0.2s; color: var(--ink-3); font-size: 16px; }
+
+.acc__item.is-open .acc__sign { transform: rotate(45deg); }
+
+.acc__content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+}
+
+.acc__item.is-open .acc__content { max-height: 1200px; }
+
+.acc__content-in { padding: 0 0 20px; }
+
+.acc__content p, .acc__content li { font-size: 14px; line-height: 1.7; color: var(--ink-2); }
+.acc__content ul, .acc__content ol { margin: 6px 0; padding-left: 20px; }
+.acc__content code { font-family: var(--mono); font-size: 12.5px; background: var(--band); border: 1px solid var(--line); border-radius: 5px; padding: 2px 6px; }
+
+/* --------------------------------------------------------------------------
+   Toasts + footer
+   -------------------------------------------------------------------------- */
+
+.toasts {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 90;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: min(420px, calc(100vw - 40px));
+}
+
+.toast { background: var(--ink); color: #fff; border: 1px solid var(--ink); border-radius: 10px; padding: 12px 16px; font-size: 13px; box-shadow: 0 8px 24px rgba(0,0,0,0.22); animation: toast-in 0.2s ease; }
+
+@keyframes toast-in { from { opacity: 0; transform: translateY(8px); } }
+
+.foot {
+    border-top: 1px solid var(--line);
+    padding: 40px 0 56px;
+}
+
+.foot__in { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--ink-3); letter-spacing: 0.02em; }
+
+@media (max-width: 560px) {
+    .wrap { padding: 0 18px; }
+    .sec { padding-top: 64px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Boot screen -->
+<div class="boot" id="bootScreen" aria-label="Loading">
+    <div class="boot__mark">SE</div>
+    <div id="bootMessage">Connecting to system…</div>
+    <div class="boot__spin" aria-hidden="true"></div>
+</div>
+
+<!-- Application -->
+<div id="app" hidden>
+
+<header class="head">
+    <div class="wrap">
+        <div class="head__row">
+            <a class="wordmark" href="landing.html">
+                <span class="wordmark__mark">SE</span>
+                <span>Smart Environment</span>
+            </a>
+
+            <nav class="head__nav" id="topNav" aria-label="Dashboard sections">
+                <a href="#sec-now" data-section="now" class="is-active" aria-current="true">Now</a>
+                <a href="#sec-environment" data-section="environment">Environment</a>
+                <a href="#sec-light" data-section="light">Light</a>
+                <a href="#sec-control" data-section="control">Control</a>
+                <a href="#sec-automation" data-section="automation">Automation</a>
+                <a href="#sec-history" data-section="history">History</a>
+                <a href="#sec-analytics" data-section="analytics">Analytics</a>
+                <a href="#sec-docs" data-section="docs">Documentation</a>
+            </nav>
+
+            <div class="head__meta">
+                <span class="pill pill--warn" id="modePill">CONNECTING</span>
+                <span class="head__user mono" id="userLabel">—</span>
+                <button class="link-btn" id="btnLogout" type="button">Sign out</button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="wrap">
+
+        <!-- ================= NOW ================= -->
+        <section class="sec" id="sec-now">
+            <div class="sec__head">
+                <span class="sec__no">00</span>
+                <h2>NOW</h2>
+            </div>
+
+            <div class="now">
+                <div class="now__cell">
+                    <div class="now__label"><span class="dot" id="espDot"></span>AIR TEMPERATURE</div>
+                    <div class="now__value col-temp" id="nowTemp">—<span class="now__unit">°C</span></div>
+                    <div class="now__meta">DHT11 · <span class="mono" id="nowTempTime">—</span></div>
+                </div>
+                <div class="now__cell">
+                    <div class="now__label"><span class="dot" id="humDot"></span>HUMIDITY</div>
+                    <div class="now__value col-hum" id="nowHum">—<span class="now__unit">%</span></div>
+                    <div class="now__meta">DHT11 · <span class="mono" id="nowHumTime">—</span></div>
+                </div>
+                <div class="now__cell">
+                    <div class="now__label"><span class="dot" id="ldrDot"></span>AMBIENT LIGHT</div>
+                    <div class="now__value col-ldr" id="nowLdr">—</div>
+                    <div class="now__meta">LDR · 0–1023 · <span class="mono" id="nowLdrTime">—</span></div>
+                </div>
+            </div>
+
+            <div class="status-strip">
+                <div class="status-cell">
+                    <div class="sysrow"><span class="dot" id="sysEspDot"></span><span class="sysrow__text" id="sysEspText">WAITING</span></div>
+                    <div class="now__meta" style="margin-top:6px">ESP32 device</div>
+                </div>
+                <div class="status-cell">
+                    <div class="sysrow"><span class="dot" id="sysFbDot"></span><span class="sysrow__text" id="sysFbText">WAITING</span></div>
+                    <div class="now__meta" style="margin-top:6px">Firebase</div>
+                </div>
+                <div class="status-cell">
+                    <div class="sysrow"><span class="dot" id="sysModeDot"></span><span class="sysrow__text" id="sysModeText">—</span></div>
+                    <div class="now__meta" style="margin-top:6px">Operating mode</div>
+                </div>
+                <div class="status-cell">
+                    <div class="sysrow"><span class="dot" id="sysBulbDot"></span><span class="sysrow__text" id="sysBulbText">—</span></div>
+                    <div class="now__meta" style="margin-top:6px">230 V bulb</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= ENVIRONMENT ================= -->
+        <section class="sec sec--tint" id="sec-environment">
+            <div class="sec__head">
+                <span class="sec__no">01</span>
+                <h2>ENVIRONMENT</h2>
+            </div>
+            <p class="sec__sub">Live instruments &middot; last reading <span class="mono" id="envLast">&mdash;</span></p>
+
+            <div class="instr-grid">
+                <div class="instr">
+                    <div class="instr__label"><span><span class="dot" id="envTempDot"></span> TEMPERATURE</span><span class="mono">°C</span></div>
+                    <div class="instr__value col-temp"><span id="envTemp">—</span><span class="instr__unit">°C</span></div>
+                    <div class="instr__source" id="envTempMeta">DHT11 · — · LIVE</div>
+
+                    <div class="range-track" aria-hidden="true">
+                        <div class="range-span" id="tempSpan" hidden></div>
+                        <div class="range-mark range-mark--temp" id="tempMark" hidden></div>
+                    </div>
+                    <div class="range-caption"><span>SESSION MIN</span><span>SESSION MAX</span></div>
+
+                    <div class="stat-grid">
+                        <div class="stat"><div class="stat__k">Current</div><div class="stat__v" id="envTempCur">—</div></div>
+                        <div class="stat"><div class="stat__k">Min</div><div class="stat__v" id="envTempMin">—</div></div>
+                        <div class="stat"><div class="stat__k">Max</div><div class="stat__v" id="envTempMax">—</div></div>
+                        <div class="stat"><div class="stat__k">Avg</div><div class="stat__v" id="envTempAvg">—</div></div>
+                    </div>
+                </div>
+
+                <div class="instr">
+                    <div class="instr__label"><span><span class="dot" id="envHumDot"></span> HUMIDITY</span><span class="mono">%</span></div>
+                    <div class="instr__value col-hum"><span id="envHum">—</span><span class="instr__unit">%</span></div>
+                    <div class="instr__source" id="envHumMeta">DHT11 · — · LIVE</div>
+
+                    <div class="range-track" aria-hidden="true">
+                        <div class="range-span" id="humSpan" hidden></div>
+                        <div class="range-mark range-mark--hum" id="humMark" hidden></div>
+                    </div>
+                    <div class="range-caption"><span>SESSION MIN</span><span>SESSION MAX</span></div>
+
+                    <div class="stat-grid">
+                        <div class="stat"><div class="stat__k">Current</div><div class="stat__v" id="envHumCur">—</div></div>
+                        <div class="stat"><div class="stat__k">Min</div><div class="stat__v" id="envHumMin">—</div></div>
+                        <div class="stat"><div class="stat__k">Max</div><div class="stat__v" id="envHumMax">—</div></div>
+                        <div class="stat"><div class="stat__k">Avg</div><div class="stat__v" id="envHumAvg">—</div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= LIGHT ================= -->
+        <section class="sec" id="sec-light">
+            <div class="sec__head">
+                <span class="sec__no">02</span>
+                <h2>LIGHT</h2>
+            </div>
+
+            <div class="light-meter">
+                <div class="light-meter__top">
+                    <div>
+                        <div class="light-meter__value col-ldr" id="ldrValue">—</div>
+                        <div class="now__meta">LDR · raw ADC 0–1023</div>
+                    </div>
+                    <div class="light-meter__band">
+                        <div class="band-label"><span class="dot" id="ldrDot2"></span>&nbsp;<span id="ldrLabelText">—</span></div>
+                        <div class="band-hint" id="ldrHint">no reading</div>
+                    </div>
+                </div>
+
+                <div class="ldr-scale">
+                    <div class="ldr-labels"><span>DARK</span><span>DIM</span><span>NORMAL</span><span>BRIGHT</span></div>
+                    <div class="ldr-track" id="ldrTrack">
+                        <div class="ldr-thresh" id="ldrThresh" aria-hidden="true"></div>
+                        <div class="ldr-marker" id="ldrMarker" hidden></div>
+                    </div>
+                    <div class="ldr-ticks" aria-hidden="true">
+                        <span class="ldr-tick" style="left:0%">0</span>
+                        <span class="ldr-tick" style="left:14.66%">150</span>
+                        <span class="ldr-tick" style="left:34.21%">350</span>
+                        <span class="ldr-tick" style="left:68.43%">700</span>
+                        <span class="ldr-tick" style="left:100%">1023</span>
+                    </div>
+                    <div class="range-caption"><span class="mono">BAND EDGES</span><span>THRESHOLD <span class="mono" id="ldrThreshold">—</span></span></div>
+                </div>
+
+                <div class="stat-grid" style="margin-top:30px">
+                    <div class="stat"><div class="stat__k">Last reading</div><div class="stat__v mono" style="font-size:13px" id="ldrLast">—</div></div>
+                    <div class="stat"><div class="stat__k">Min</div><div class="stat__v" id="ldrMin">—</div></div>
+                    <div class="stat"><div class="stat__k">Max</div><div class="stat__v" id="ldrMax">—</div></div>
+                    <div class="stat"><div class="stat__k">Avg</div><div class="stat__v" id="ldrAvg">—</div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= CONTROL ================= -->
+        <section class="sec sec--tint" id="sec-control">
+            <div class="sec__head">
+                <span class="sec__no">03</span>
+                <h2>CONTROL</h2>
+            </div>
+
+            <div class="ctl">
+                <div class="ctl-grid">
+                    <div class="ctl__left">
+                        <h3>OPERATING MODE</h3>
+                        <p class="ctl__note">The ESP32 switches the bulb manually, or automatically from ambient light.</p>
+
+                        <div class="seg" role="group" aria-label="Operating mode">
+                            <button type="button" id="segManual" class="is-active" aria-pressed="true">MANUAL</button>
+                            <button type="button" id="segAuto" aria-pressed="false">AUTO</button>
+                        </div>
+
+                        <div id="ctrlFeedback" class="ctl__feedback">No command sent yet in this session.</div>
+                    </div>
+
+                    <div class="ctl__right">
+                        <h3>BULB · 230 V</h3>
+                        <p class="ctl__note">Commands are sent to Firebase; the dashboard never assumes the bulb moved.</p>
+
+                        <div class="tbtn-row">
+                            <button class="tbtn" id="btnBulbOn" type="button" disabled>
+                                <b>ON</b><span>close the relay</span>
+                            </button>
+                            <button class="tbtn" id="btnBulbOff" type="button" disabled>
+                                <b>OFF</b><span>open the relay</span>
+                            </button>
+                        </div>
+
+                        <div class="ctl__state">
+                            <span class="dot" id="bulbLiveDot"></span>
+                            <span>BULB</span>
+                            <span class="big mono" id="bulbLiveText">—</span>
+                            <span style="color:var(--ink-3); font-size:12.5px" id="bulbLiveHint"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ctl__right" id="autoPanel" style="border-top:1px solid var(--line); padding-top:30px; margin-top:8px">
+                    <h3>AUTOMATIC RULE</h3>
+                    <p class="ctl__note">In AUTO mode the bulb is driven by the ambient light threshold.</p>
+
+                    <div class="th-row" style="max-width:520px">
+                        <div class="th-field">
+                            <label for="autoThresholdInput">LDR threshold (0–1023)</label>
+                            <input class="input" id="autoThresholdInput" type="number" min="0" max="1023" step="1" value="500" inputmode="numeric">
+                        </div>
+                        <div style="align-self:flex-end">
+                            <button class="btn" id="btnThresholdSave" type="button">SAVE</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= AUTOMATION ================= -->
+        <section class="sec" id="sec-automation">
+            <div class="sec__head">
+                <span class="sec__no">04</span>
+                <h2>AUTOMATION</h2>
+            </div>
+
+            <div class="rule">
+                <div class="rule__line">
+                    IF&nbsp;&nbsp;<span class="rule__token">LDR &lt;</span>&nbsp;&nbsp;<span class="rule__val" id="ruleTh1">500</span>
+                    &nbsp;&nbsp;<span class="rule__arrow">THEN</span>&nbsp;&nbsp;BULB <span class="rule__val rule__val--accent" id="ruleOut1">→ ON</span>
+                </div>
+                <div class="rule__line rule__gap">
+                    ELSE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    BULB <span class="rule__val" id="ruleOut2">→ OFF</span>
+                </div>
+
+                <div class="rule__eval">
+                    <span class="rule__chip"><span class="dot" id="autoModeDot"></span><span id="autoMode">—</span></span>
+                    <span class="rule__chip" id="autoDecisionChip"><span class="dot" id="autoDecisionDot"></span><span id="autoDecision">WAITING FOR SENSOR</span></span>
+                    <span class="rule__detail" id="autoDecisionDetail">—</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= HISTORY ================= -->
+        <section class="sec sec--tint" id="sec-history">
+            <div class="sec__head">
+                <span class="sec__no">05</span>
+                <h2>HISTORY</h2>
+                <span style="margin-left:auto"><button class="btn" id="btnExportCSV" type="button" style="padding:9px 16px; font-size:12px">EXPORT CSV</button></span>
+            </div>
+
+            <div class="table-toolbar">
+                <p id="logsInfo">No data available for export.</p>
+                <p><span class="mono" id="logsCount">—</span> records</p>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Temperature</th>
+                            <th>Humidity</th>
+                            <th>Light</th>
+                            <th>Bulb</th>
+                            <th>Mode</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ================= ANALYTICS ================= -->
+        <section class="sec" id="sec-analytics">
+            <div class="sec__head">
+                <span class="sec__no">06</span>
+                <h2>ANALYTICS</h2>
+            </div>
+
+            <div class="chart-grid" id="chartsWrap">
+                <div class="chart-panel">
+                    <h3>Air temperature</h3>
+                    <p class="chart-cap">DHT11 · °C · session history</p>
+                    <div class="chart-box"><canvas id="chartTemp"></canvas></div>
+                </div>
+                <div class="chart-panel">
+                    <h3>Humidity</h3>
+                    <p class="chart-cap">DHT11 · % · session history</p>
+                    <div class="chart-box"><canvas id="chartHum"></canvas></div>
+                </div>
+                <div class="chart-panel">
+                    <h3>Ambient light</h3>
+                    <p class="chart-cap">LDR · 0–1023 · session history</p>
+                    <div class="chart-box"><canvas id="chartLdr"></canvas></div>
+                </div>
+            </div>
+
+            <div class="chart-empty" id="chartsEmpty" hidden></div>
+            <div id="chartsUnavailable" hidden>
+                <p class="empty-note">Chart.js could not be loaded from the CDN. Analytics will resume when the library is reachable.</p>
+            </div>
+        </section>
+
+        <!-- ================= DOCUMENTATION ================= -->
+        <section class="sec sec--tint" id="sec-docs">
+            <div class="sec__head">
+                <span class="sec__no">07</span>
+                <h2>DOCUMENTATION</h2>
+            </div>
+
+            <div class="docs">
+
+                <div class="doc-block">
+                    <h3>Hardware &amp; safety</h3>
+                    <p>
+                        This system switches a 230 V mains load. It is designed for an isolated project
+                        bench with the relay module fed through a fused plug, grounded enclosure and an
+                        RCD-protected supply. Only qualified personnel should connect mains wiring.
+                    </p>
+                    <ul>
+                        <li>ESP32 dev board — reads sensors and drives the relay.</li>
+                        <li>DHT11 — air temperature and humidity.</li>
+                        <li>LDR + fixed resistor divider — ambient light on the ADC.</li>
+                        <li>Relay module (isolated) — switches the lamp circuit.</li>
+                        <li>230 V bulb — the controlled appliance.</li>
+                    </ul>
+                </div>
+
+                <div class="doc-block">
+                    <h3>Firebase setup</h3>
+                    <p>
+                        Create or reuse a Firebase project, enable the <b>Realtime Database</b>, and copy
+                        the web app config into <code>dashboard.html</code> at the top of the script.
+                        The dashboard requires <code>apiKey</code>, <code>authDomain</code>,
+                        <code>databaseURL</code> and <code>projectId</code>; any placeholder value
+                        leaves the dashboard in CONFIGURATION REQUIRED state.
+                    </p>
+                    <div class="doc-empty">Example rules are illustrative. Configure security rules to expose only the paths this device needs.</div>
+                </div>
+
+                <div class="doc-block">
+                    <h3>Realtime Database structure</h3>
+                    <table class="doc-table">
+                        <thead>
+                            <tr><th>Path</th><th>Content</th><th>Writer</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>sensorData/</code></td><td>latest temperature, humidity, ldr, bulbState, mode, timestamp</td><td>ESP32</td></tr>
+                            <tr><td><code>settings/</code></td><td>mode (MANUAL / AUTOMATIC), ldrThreshold</td><td>ESP32 · dashboard</td></tr>
+                            <tr><td><code>control/bulbState</code></td><td>true / false command</td><td>dashboard</td></tr>
+                            <tr><td><code>logs/</code></td><td>historical readings</td><td>ESP32</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="doc-block">
+                    <h3>ESP32 device workflow</h3>
+                    <ol>
+                        <li>Boot and connect to Wi-Fi.</li>
+                        <li>Authenticate with Realtime Database credentials.</li>
+                        <li>Publish <code>sensorData</code> each cycle and push a <code>logs</code> entry.</li>
+                        <li>Listen on <code>control/bulbState</code> and <code>settings/</code>.</li>
+                        <li>In AUTO, raise the relay when LDR &lt; ldrThreshold, otherwise lower it.</li>
+                        <li>In MANUAL, mirror <code>control/bulbState</code> to the relay.</li>
+                    </ol>
+                    <div class="doc-empty">Device code is out of scope for this dashboard. Screenshots and a walkthrough video will be embedded here when available.</div>
+                </div>
+
+                <div class="doc-block">
+                    <h3>Known issues &amp; troubleshooting</h3>
+
+                    <div class="acc__item is-open">
+                        <button class="acc__btn" type="button" aria-expanded="true">
+                            <span><span class="acc__ix">01</span>Dashboard shows "Sign in required"</span>
+                            <span class="acc__sign" aria-hidden="true">+</span>
+                        </button>
+                        <div class="acc__content">
+                            <div class="acc__content-in">
+                                <p>Open <code>index.html</code> and sign in with your Google account.
+                                The dashboard requires Firebase Authentication. If sign-in fails with
+                                <code>operation-not-allowed</code>, enable Google sign-in in
+                                Firebase Console &rarr; Authentication &rarr; Sign-in method.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="acc__item">
+                        <button class="acc__btn" type="button" aria-expanded="false">
+                            <span><span class="acc__ix">02</span>Dashboard shows DISCONNECTED or OFFLINE</span>
+                            <span class="acc__sign" aria-hidden="true">+</span>
+                        </button>
+                        <div class="acc__content">
+                            <div class="acc__content-in">
+                                <p>Check internet access and Firebase availability. For the ESP32, confirms it
+                                wrote <code>sensorData/timestamp</code> within the last 90 s; otherwise the
+                                expected ONLINE / STALE / OFFLINE logic will not clear.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="acc__item">
+                        <button class="acc__btn" type="button" aria-expanded="false">
+                            <span><span class="acc__ix">03</span>Bulb ON succeeds but the lamp stays off</span>
+                            <span class="acc__sign" aria-hidden="true">+</span>
+                        </button>
+                        <div class="acc__content">
+                            <div class="acc__content-in">
+                                <p>The command only updates <code>control/bulbState</code>. The device must be
+                                running and subscribed to that path to drive the relay. If it is offline no physical
+                                change occurs — this is the intended, honest behaviour.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="acc__item">
+                        <button class="acc__btn" type="button" aria-expanded="false">
+                            <span><span class="acc__ix">04</span>Charts stay empty</span>
+                            <span class="acc__sign" aria-hidden="true">+</span>
+                        </button>
+                        <div class="acc__content">
+                            <div class="acc__content-in">
+                                <p>Charts render only from real <code>logs/</code> records. If the device has not
+                                published yet, the panels remain empty by design. Blocked CDNs also leave analytics
+                                unavailable.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<footer class="foot">
+    <div class="wrap foot__in">
+        <span>Smart Environment &amp; Appliance Control</span>
+        <span>ESP32 <span style="margin:0 8px">·</span> Firebase <span style="margin:0 8px">·</span> DHT11
+              <span style="margin:0 8px">·</span> LDR <span style="margin:0 8px">·</span> Relay
+              <span style="margin:0 8px">·</span> IoT Monitoring &amp; Automation Project</span>
+    </div>
+</footer>
+
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+// =====================================================
+// FIREBASE CONFIGURATION
+// Replace the placeholder values below with your
+// Firebase Web App configuration.
+// =====================================================
+
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "dashboard-iot-d7f6c.firebaseapp.com",
+    databaseURL: "https://dashboard-iot-d7f6c-default-rtdb.firebaseio.com",
+    projectId: "dashboard-iot-d7f6c",
+    storageBucket: "dashboard-iot-d7f6c.firebasestorage.app",
+    messagingSenderId: "16305837357",
+    appId: "1:16305837357:web:9d69f5e1ffe768ad45afa4"
+};
+
+const FIREBASE_VERSION = "10.12.2";
+const FIREBASE_BASE = "https://www.gstatic.com/firebasejs/" + FIREBASE_VERSION;
+
+// =====================================================
+// APPLICATION STATE
+// =====================================================
+
+const state = {
+    fb: null,                 // { app, db, api } when initialized
+    fbConnected: null,        // null | true | false
+    configValid: null,        // null | true | false
+    live: {
+        temperature: null,
+        humidity: null,
+        ldr: null,
+        bulbState: null,
+        mode: null,
+        timestamp: null
+    },
+    settings: {
+        mode: "MANUAL",
+        ldrThreshold: 500
+    },
+    logs: [],                 // newest first
+    charts: { temperature: null, humidity: null, ldr: null },
+    chartsReady: false,
+    chartsAvailable: false,
+    unsubs: [],
+    renderQueued: false,
+    busy: { bulb: false },
+    pendingBulb: null         // null | true | false — last command not yet confirmed
+};
+
+// =====================================================
+// UI UTILITIES
+// =====================================================
+
+function $(id) { return document.getElementById(id); }
+
+function setText(id, text) {
+    const node = document.getElementById(id);
+    if (node && text != null) node.textContent = text;
+}
+
+function fmt1(v) { return v == null ? "\u2014" : v.toFixed(1); }
+function fmt0(v) { return v == null ? "\u2014" : Math.round(v); }
+
+function toNum(v, fallback) {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : (fallback !== undefined ? fallback : null);
+}
+
+function toBool(v) {
+    if (v === true || v === 1 || v === "1" || v === "true" || v === "ON" || v === "on") return true;
+    if (v === false || v === 0 || v === "0" || v === "false" || v === "OFF" || v === "off") return false;
+    return null;
+}
+
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function formatTime(ts) {
+    if (!ts) return "\u2014";
+    return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+}
+
+function formatFullTime(ts) {
+    if (!ts) return "\u2014";
+    const d = new Date(ts);
+    const p = (n) => String(n).padStart(2, "0");
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds());
+}
+
+function formatCSVTime(ts) {
+    if (!ts) return "";
+    const d = new Date(ts);
+    const p = (n) => String(n).padStart(2, "0");
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds());
+}
+
+let toastCounter = 0;
+function showToast(message, type) {
+    const wrap = $("toasts");
+    if (!wrap) return;
+    const t = document.createElement("div");
+    t.className = "toast" + (type ? " toast--" + type : "");
+    t.setAttribute("role", "status");
+    t.textContent = message;
+    wrap.appendChild(t);
+    const id = ++toastCounter;
+    setTimeout(function () {
+        const node = wrap.children[wrap.children.length - 1];
+        if (node && id) { node.remove(); }
+    }, 3600);
+}
+
+function dotClass(level) {
+    return "dot dot--" + (level || "dim");
+}
+
+function setDot(id, level) {
+    const node = $(id);
+    if (node) node.className = dotClass(level);
+}
+
+function setChip(dotId, textId, level, text) {
+    setDot(dotId, level);
+    setText(textId, text);
+}
+
+// =====================================================
+// STATUS COMPUTATION
+// =====================================================
+
+function controlEnabled() {
+    return state.configValid === true && !!state.fb && state.fbConnected === true;
+}
+
+function computeESPStatus() {
+    const ts = state.live.timestamp;
+    if (ts == null) return { level: "warn", text: "WAITING" };
+    const age = Date.now() - ts;
+    if (age < 30000) return { level: "ok", text: "ONLINE" };
+    if (age < 90000) return { level: "warn", text: "STALE" };
+    return { level: "err", text: "OFFLINE" };
+}
+
+function computeFirebaseStatus() {
+    if (state.configValid === false) return { level: "warn", text: "CONFIGURATION REQUIRED" };
+    if (!state.fb) return { level: "err", text: "UNAVAILABLE" };
+    if (state.fbConnected === false) return { level: "err", text: "DISCONNECTED" };
+    if (state.fbConnected === true) return { level: "ok", text: "CONNECTED" };
+    return { level: "warn", text: "CONNECTING" };
+}
+
+function computeSensorStatus() {
+    const ts = state.live.timestamp;
+    if (ts == null) return { level: "warn", text: "WAITING" };
+    const age = Date.now() - ts;
+    if (age < 30000) return { level: "ok", text: "RECEIVING" };
+    return { level: "warn", text: "WAITING" };
+}
+
+function updateStatus() {
+    const esp = computeESPStatus();
+    const fb = computeFirebaseStatus();
+    const sensor = computeSensorStatus();
+    const l = state.live;
+
+    // Header pill
+    const pill = $("modePill");
+    if (pill) {
+        if (state.configValid === false) {
+            pill.textContent = "CONFIGURATION REQUIRED";
+            pill.className = "pill pill--warn";
+        } else if (!state.fb) {
+            pill.textContent = "FIREBASE UNAVAILABLE";
+            pill.className = "pill pill--danger";
+        } else if (state.fbConnected === true) {
+            pill.textContent = "LIVE \u00b7 FIREBASE";
+            pill.className = "pill pill--live";
+        } else {
+            pill.textContent = "CONNECTING \u00b7 FIREBASE";
+            pill.className = "pill pill--warn";
+        }
+    }
+
+    // Status strip (NOW)
+    setChip("sysEspDot", "sysEspText", esp.level, esp.text);
+    setChip("sysFbDot", "sysFbText", fb.level, fb.text);
+    setChip("sysModeDot", "sysModeText", state.settings.mode === "AUTOMATIC" ? "accent" : "dim", state.settings.mode || "\u2014");
+    if (l.bulbState == null) setChip("sysBulbDot", "sysBulbText", "dim", "\u2014");
+    else setChip("sysBulbDot", "sysBulbText", l.bulbState ? "ok" : "dim", l.bulbState ? "ON" : "OFF");
+
+    // Header ESP dot (maps to NOW cells too)
+    setDot("espDot", esp.level);
+    setDot("humDot", sensor.level);
+    setDot("ldrDot", sensor.level);
+
+    // Live timestamps
+    setText("nowTempTime", formatTime(l.timestamp));
+    setText("nowHumTime", formatTime(l.timestamp));
+    setText("nowLdrTime", formatTime(l.timestamp));
+}
+
+// =====================================================
+// DATA NORMALIZATION
+// =====================================================
+
+function normalizeLive(v) {
+    const out = {
+        temperature: toNum(v && v.temperature),
+        humidity: toNum(v && v.humidity),
+        ldr: toNum(v && v.ldr),
+        bulbState: toBool(v && v.bulbState),
+        mode: (v && v.mode === "AUTOMATIC") ? "AUTOMATIC" : (v && v.mode ? String(v.mode).toUpperCase() : null),
+        timestamp: toNum(v && v.timestamp)
+    };
+    if (out.mode === "MANUAL" || out.mode === "AUTOMATIC") {
+        state.settings.mode = out.mode;
+    }
+    return out;
+}
+
+function normalizeSettings(v) {
+    const mode = (v && v.mode === "AUTOMATIC") ? "AUTOMATIC" : "MANUAL";
+    const th = toNum(v && v.ldrThreshold, 500);
+    return { mode: mode, ldrThreshold: clamp(th, 0, 1023) };
+}
+
+function normalizeLog(v) {
+    if (!v || typeof v !== "object") return null;
+    const ts = toNum(v.timestamp);
+    if (!ts) return null;
+    return {
+        timestamp: ts,
+        temperature: toNum(v.temperature),
+        humidity: toNum(v.humidity),
+        ldr: toNum(v.ldr),
+        bulbState: toBool(v.bulbState),
+        mode: (v.mode === "AUTOMATIC") ? "AUTOMATIC" : "MANUAL"
+    };
+}
+
+// =====================================================
+// RENDERING
+// =====================================================
+
+function statsFor(key) {
+    let min = Infinity, max = -Infinity, sum = 0, n = 0;
+    for (let i = 0; i < state.logs.length; i++) {
+        const v = state.logs[i][key];
+        if (v == null) continue;
+        min = Math.min(min, v);
+        max = Math.max(max, v);
+        sum += v;
+        n++;
+    }
+    if (n === 0) return { min: null, max: null, avg: null, n: 0 };
+    return { min: min, max: max, avg: sum / n, n: n };
+}
+
+function ldrLabel(v) {
+    if (v == null) return { text: "\u2014", level: "dim", hint: "no reading" };
+    if (v < 150) return { text: "DARK", level: "err", hint: "very low ambient light" };
+    if (v < 350) return { text: "DIM", level: "warn", hint: "low ambient light" };
+    if (v < 700) return { text: "NORMAL", level: "ok", hint: "moderate ambient light" };
+    return { text: "BRIGHT", level: "ok", hint: "high ambient light" };
+}
+
+function metaLine(source, live) {
+    return source + " \u00b7 " + (live.timestamp ? formatTime(live.timestamp) : "\u2014") + " \u00b7 LIVE";
+}
+
+function renderAll() {
+    updateStatus();
+    renderNow();
+    renderEnvironment();
+    renderLight();
+    renderControl();
+    renderAutomation();
+    renderLogs();
+    renderCharts();
+}
+
+function renderNow() {
+    const l = state.live;
+    setText("nowTemp", l.temperature == null ? "\u2014" : fmt1(l.temperature));
+    setText("nowHum", l.humidity == null ? "\u2014" : fmt0(l.humidity));
+    setText("nowLdr", l.ldr == null ? "\u2014" : fmt0(l.ldr));
+}
+
+function setRange(id, loPct, hiPct) {
+    const span = $(id + "Span");
+    const mark = $(id + "Mark");
+    if (loPct == null || hiPct == null) {
+        if (span) span.hidden = true;
+        if (mark) mark.hidden = true;
+        return;
+    }
+    if (span) { span.hidden = false; span.style.left = loPct + "%"; span.style.width = Math.max(0, hiPct - loPct) + "%"; }
+    if (mark) { mark.hidden = false; mark.style.left = loPct + "%"; }
+}
+
+function renderEnvironment() {
+    const l = state.live;
+    const t = statsFor("temperature");
+    const h = statsFor("humidity");
+
+    setText("envTemp", l.temperature == null ? "\u2014" : fmt1(l.temperature));
+    setText("envHum", l.humidity == null ? "\u2014" : fmt0(l.humidity));
+    setText("envLast", l.timestamp ? formatFullTime(l.timestamp) : "\u2014");
+
+    setDot("envTempDot", l.temperature == null ? "dim" : "ok");
+    setDot("envHumDot", l.humidity == null ? "dim" : "ok");
+    setText("envTempMeta", metaLine("DHT11", l));
+    setText("envHumMeta", metaLine("DHT11", l));
+
+    setText("envTempCur", l.temperature == null ? "\u2014 \u00b0C" : fmt1(l.temperature) + " \u00b0C");
+    setText("envTempMin", t.min == null ? "\u2014 \u00b0C" : fmt1(t.min) + " \u00b0C");
+    setText("envTempMax", t.max == null ? "\u2014 \u00b0C" : fmt1(t.max) + " \u00b0C");
+    setText("envTempAvg", t.avg == null ? "\u2014 \u00b0C" : fmt1(t.avg) + " \u00b0C");
+
+    setText("envHumCur", l.humidity == null ? "\u2014 %" : fmt0(l.humidity) + " %");
+    setText("envHumMin", h.min == null ? "\u2014 %" : fmt0(h.min) + " %");
+    setText("envHumMax", h.max == null ? "\u2014 %" : fmt0(h.max) + " %");
+    setText("envHumAvg", h.avg == null ? "\u2014 %" : fmt0(h.avg) + " %");
+
+    // Session range bars (min .. max, marker at current)
+    if (t.min != null && t.max != null && t.max > t.min) {
+        const cur = l.temperature == null ? t.max : clamp(l.temperature, t.min, t.max);
+        setRange("temp", ((t.min - t.min) / (t.max - t.min)) * 100, ((cur - t.min) / (t.max - t.min)) * 100);
+    } else {
+        setRange("temp", null, null);
+    }
+    if (h.min != null && h.max != null && h.max > h.min) {
+        const cur = l.humidity == null ? h.max : clamp(l.humidity, h.min, h.max);
+        setRange("hum", ((h.min - h.min) / (h.max - h.min)) * 100, ((cur - h.min) / (h.max - h.min)) * 100);
+    } else {
+        setRange("hum", null, null);
+    }
+}
+
+function renderLight() {
+    const l = state.live;
+    const ls = statsFor("ldr");
+    const label = ldrLabel(l.ldr);
+
+    setText("ldrValue", l.ldr == null ? "\u2014" : fmt0(l.ldr));
+    setText("ldrLabelText", l.ldr == null ? "\u2014" : label.text);
+    setDot("ldrDot2", l.ldr == null ? "dim" : label.level);
+    setText("ldrHint", l.ldr == null ? "no reading" : label.hint);
+
+    setText("ldrThreshold", fmt0(state.settings.ldrThreshold));
+    setText("ldrLast", l.timestamp ? formatFullTime(l.timestamp) : "\u2014");
+    setText("ldrMin", ls.min == null ? "\u2014" : fmt0(ls.min));
+    setText("ldrMax", ls.max == null ? "\u2014" : fmt0(ls.max));
+    setText("ldrAvg", ls.avg == null ? "\u2014" : fmt0(ls.avg));
+
+    // Marker on the 0–1023 scale
+    const mark = $("ldrMarker");
+    if (mark) {
+        if (l.ldr == null) mark.hidden = true;
+        else { mark.hidden = false; mark.style.left = clamp((l.ldr / 1023) * 100, 2, 98) + "%"; }
+    }
+    const thresh = $("ldrThresh");
+    if (thresh) thresh.style.left = clamp((state.settings.ldrThreshold / 1023) * 100, 0.5, 99.5) + "%";
+}
+
+function renderControl() {
+    const l = state.live;
+    const mode = state.settings.mode;
+    const bulb = l.bulbState;
+    const enabled = controlEnabled();
+
+    // Mode segments
+    setSeg("segManual", mode === "MANUAL");
+    setSeg("segAuto", mode === "AUTOMATIC");
+    $("segManual").disabled = !enabled;
+    $("segAuto").disabled = !enabled;
+
+    // Bulb buttons only act in MANUAL and when live-connected
+    const manual = mode !== "AUTOMATIC";
+    const busy = state.busy.bulb;
+    const usable = enabled && manual && !busy;
+    const btnOn = $("btnBulbOn");
+    const btnOff = $("btnBulbOff");
+    btnOn.disabled = !usable;
+    btnOff.disabled = !usable;
+    btnOn.classList.toggle("is-pressed", bulb === true);
+    btnOff.classList.toggle("is-pressed", bulb === false);
+
+    // Live bulb readout
+    if (bulb == null) {
+        setDot("bulbLiveDot", "dim");
+        setText("bulbLiveText", "\u2014");
+        setText("bulbLiveHint", "device has not reported");
+    } else {
+        setDot("bulbLiveDot", bulb ? "ok" : "dim");
+        setText("bulbLiveText", bulb ? "ON" : "OFF");
+        setText("bulbLiveHint", mode === "AUTOMATIC" ? "driven by auto rule" : "relay " + (bulb ? "closed" : "open"));
+    }
+
+    // Command feedback (honest: only reports sent/confirmed from real state)
+    const fb = $("ctrlFeedback");
+    if (fb) {
+        if (busy) {
+            fb.textContent = "Sending command to Firebase…";
+        } else if (state.pendingBulb != null) {
+            if (bulb === state.pendingBulb) {
+                fb.textContent = "Confirmed \u2014 the device reports bulb " + (bulb ? "ON" : "OFF") + ".";
+                state.pendingBulb = null;
+            } else if (bulb == null) {
+                fb.textContent = "COMMAND SENT \u2014 awaiting device confirmation (device offline or still switching).";
+            } else {
+                fb.textContent = "COMMAND SENT \u2014 device currently reports " + (bulb ? "ON" : "OFF") + ".";
+            }
+        } else if (mode === "AUTOMATIC") {
+            fb.textContent = "Automatic mode is active \u2014 switching the lamp to Manual enables the ON / OFF buttons.";
+        } else {
+            fb.textContent = "No command sent yet in this session.";
+        }
+    }
+
+    // Threshold field enablement
+    $("autoThresholdInput").disabled = !enabled;
+    $("btnThresholdSave").disabled = !enabled;
+}
+
+function setSeg(id, active) {
+    const node = $(id);
+    if (!node) return;
+    node.classList.toggle("is-active", active);
+    node.setAttribute("aria-pressed", active ? "true" : "false");
+}
+
+function renderAutomation() {
+    const mode = state.settings.mode;
+    const th = state.settings.ldrThreshold;
+    const ldr = state.live.ldr;
+    const bulb = state.live.bulbState;
+
+    setText("ruleTh1", fmt0(th));
+    setText("ruleOut1", "\u2192 ON");
+    setText("ruleOut2", "\u2192 OFF");
+
+    setChip("autoModeDot", "autoMode", mode === "AUTOMATIC" ? "accent" : "dim",
+        mode + (mode === "AUTOMATIC" ? " \u00b7 automatic rule live" : " \u00b7 manual control live"));
+
+    const thInput = $("autoThresholdInput");
+    if (thInput && document.activeElement !== thInput) thInput.value = String(th);
+
+    let decision, level, detail;
+    if (mode === "AUTOMATIC") {
+        if (ldr == null) {
+            decision = "WAITING FOR SENSOR";
+            level = "warn";
+            detail = "no current LDR reading \u2014 the rule cannot be evaluated yet";
+        } else if (ldr < th) {
+            decision = "DARK ENVIRONMENT";
+            level = "ok";
+            detail = "LDR " + fmt0(ldr) + " < threshold " + fmt0(th) + " \u2014 bulb target ON";
+        } else {
+            decision = "BRIGHT ENVIRONMENT";
+            level = "dim";
+            detail = "LDR " + fmt0(ldr) + " \u2265 threshold " + fmt0(th) + " \u2014 bulb target OFF";
+        }
+    } else {
+        decision = "MANUAL CONTROL LIVE";
+        level = "dim";
+        detail = "the bulb follows the ON / OFF commands only";
+    }
+    setChip("autoDecisionDot", "autoDecision", level, decision);
+    setText("autoDecisionDetail", detail);
+}
+
+function logRow(r) {
+    const tr = document.createElement("tr");
+    td(tr, formatFullTime(r.timestamp), "mono muted");
+    td(tr, r.temperature == null ? "\u2014" : fmt1(r.temperature) + " \u00b0C", "muted col-temp");
+    td(tr, r.humidity == null ? "\u2014" : fmt0(r.humidity) + " %", "muted col-hum");
+    td(tr, r.ldr == null ? "\u2014" : fmt0(r.ldr), "muted col-ldr");
+    const bulbTd = td(tr, "", "");
+    if (r.bulbState == null) {
+        bulbTd.textContent = "\u2014";
+    } else {
+        const b = document.createElement("span");
+        b.className = "text-badge " + (r.bulbState ? "text-badge--on" : "text-badge--off");
+        b.textContent = r.bulbState ? "ON" : "OFF";
+        bulbTd.appendChild(b);
+    }
+    const modeTd = td(tr, "", "");
+    const m = document.createElement("span");
+    m.className = "text-badge " + (r.mode === "AUTOMATIC" ? "text-badge--auto" : "text-badge--manual");
+    m.textContent = r.mode === "AUTOMATIC" ? "AUTO" : "MANUAL";
+    modeTd.appendChild(m);
+    return tr;
+}
+
+function td(tr, text, cls) {
+    const cell = document.createElement("td");
+    cell.textContent = text;
+    if (cls) cell.className += cls;
+    tr.appendChild(cell);
+    return cell;
+}
+
+function setTableBody(body, rows, emptyText) {
+    body.replaceChildren();
+    if (!rows.length) {
+        const tr = document.createElement("tr");
+        tr.className = "table-empty";
+        const cell = document.createElement("td");
+        cell.colSpan = 6;
+        cell.textContent = emptyText;
+        tr.appendChild(cell);
+        body.appendChild(tr);
+        return;
+    }
+    const frag = document.createDocumentFragment();
+    rows.forEach(function (r) { frag.appendChild(logRow(r)); });
+    body.appendChild(frag);
+}
+
+function renderLogs() {
+    const body = $("logsBody");
+    if (!body) return;
+    setTableBody(body, state.logs.slice(0, 120), "No records yet \u2014 rows appear as the device reports.");
+    setText("logsCount", state.logs.length ? state.logs.length + " record" + (state.logs.length === 1 ? "" : "s") : "\u2014");
+    setText("logsInfo", state.logs.length ? state.logs.length + " record(s) available for export." : "No data available for export.");
+}
+
+// =====================================================
+// CHARTS
+// =====================================================
+
+function ensureCharts() {
+    if (state.chartsReady) return;
+    if (!state.chartsAvailable) {
+        const u = $("chartsUnavailable");
+        if (u) u.hidden = false;
+        return;
+    }
+    const tempCtx = $("chartTemp");
+    const humCtx = $("chartHum");
+    const ldrCtx = $("chartLdr");
+    if (!tempCtx || !humCtx || !ldrCtx) return;
+
+    try {
+        state.charts.temperature = new Chart(tempCtx, chartSpec("#e0244d", "\u00b0C"));
+        state.charts.humidity = new Chart(humCtx, chartSpec("#2266cc", "%"));
+        state.charts.ldr = new Chart(ldrCtx, chartSpec("#7048e8", "0\u20131023"));
+        state.chartsReady = true;
+        renderCharts();
+    } catch (e) {
+        console.warn("Chart creation failed", e);
+        const u = $("chartsUnavailable");
+        if (u) u.hidden = false;
+    }
+}
+
+function chartSpec(color, yTitle) {
+    return {
+        type: "line",
+        data: {
+            labels: [],
+            datasets: [{
+                label: yTitle,
+                data: [],
+                borderColor: color,
+                backgroundColor: color,
+                borderWidth: 1.8,
+                pointRadius: 0,
+                pointHoverRadius: 3,
+                pointHoverBackgroundColor: color,
+                pointHoverBorderColor: "#ffffff",
+                pointHoverBorderWidth: 2,
+                tension: 0.28,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 160 },
+            interaction: { intersect: false, mode: "index" },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: "#1d1d1f",
+                    borderColor: "#d2d2d7",
+                    borderWidth: 1,
+                    padding: 10,
+                    titleColor: "#f5f5f7",
+                    bodyColor: "#f5f5f7",
+                    displayColors: false,
+                    callbacks: { title: function (items) { return items.length ? items[0].label : ""; } }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    border: { display: false },
+                    ticks: { color: "#86868b", font: { size: 11, family: "ui-monospace, Menlo, monospace" }, maxTicksLimit: 8, maxRotation: 0 }
+                },
+                y: {
+                    grid: { color: "#e8e8ed" },
+                    border: { display: false },
+                    ticks: { color: "#86868b", font: { size: 11 }, maxTicksLimit: 6 }
+                }
+            }
+        }
+    };
+}
+
+function renderCharts() {
+    if (!state.chartsReady) return;
+
+    const empty = $("chartsEmpty");
+    if (empty) {
+        empty.hidden = state.logs.length > 0;
+        if (state.logs.length === 0) empty.textContent = "Awaiting data \u2014 each line appears as readings arrive";
+    }
+
+    const asc = state.logs.slice().sort(function (a, b) { return a.timestamp - b.timestamp; });
+    const labels = asc.map(function (r) { return formatTime(r.timestamp); });
+    const t = asc.map(function (r) { return r.temperature; });
+    const h = asc.map(function (r) { return r.humidity; });
+    const d = asc.map(function (r) { return r.ldr; });
+
+    applyChart(state.charts.temperature, labels, t);
+    applyChart(state.charts.humidity, labels, h);
+    applyChart(state.charts.ldr, labels, d);
+}
+
+function applyChart(chart, labels, data) {
+    if (!chart) return;
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = data;
+    chart.update();
+}
+
+// =====================================================
+// CSV EXPORT
+// =====================================================
+
+function csvEscape(value) {
+    const s = String(value);
+    if (/[",\n]/.test(s)) {
+        return '"' + s.replace(/"/g, '""') + '"';
+    }
+    return s;
+}
+
+function exportCSV() {
+    if (!state.logs.length) {
+        showToast("No data available for export.", "warn");
+        return;
+    }
+    const asc = state.logs.slice().sort(function (a, b) { return a.timestamp - b.timestamp; });
+    const lines = ["Timestamp,Temperature,Humidity,LDR,Bulb State,Operating Mode"];
+    asc.forEach(function (r) {
+        const bulb = r.bulbState == null ? "" : (r.bulbState ? "ON" : "OFF");
+        const mode = (r.mode === "AUTOMATIC") ? "AUTOMATIC" : "MANUAL";
+        lines.push([
+            csvEscape(formatCSVTime(r.timestamp)),
+            csvEscape(r.temperature == null ? "" : r.temperature),
+            csvEscape(r.humidity == null ? "" : r.humidity),
+            csvEscape(r.ldr == null ? "" : r.ldr),
+            csvEscape(bulb),
+            csvEscape(mode)
+        ].join(","));
+    });
+
+    const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "iot_environment_data.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+    showToast("Exported " + state.logs.length + " record(s).", "success");
+}
+
+// =====================================================
+// CONTROLS / ACTIONS
+// =====================================================
+
+async function writeFirebase(path, value) {
+    if (!state.fb) throw new Error("Firebase unavailable");
+    const db = state.fb.db;
+    const api = state.fb.api;
+    return api.set(api.ref(db, path), value);
+}
+
+async function setBulb(on) {
+    if (state.settings.mode === "AUTOMATIC") {
+        showToast("Automatic mode is active \u2014 switch to Manual to control the bulb.", "warn");
+        return;
+    }
+    if (state.busy.bulb) return;
+    if (!controlEnabled()) {
+        showToast("Firebase is not connected.", "warn");
+        return;
+    }
+    state.busy.bulb = true;
+    scheduleRender();
+    try {
+        await writeFirebase("control/bulbState", on);
+        state.pendingBulb = on;
+        showToast(on ? "Bulb ON command sent." : "Bulb OFF command sent.", "success");
+    } catch (err) {
+        console.error("Failed to write control/bulbState", err);
+        state.pendingBulb = null;
+        showToast("Failed to reach Firebase.", "error");
+    }
+    state.busy.bulb = false;
+    scheduleRender();
+}
+
+async function setMode(mode) {
+    const next = mode === "AUTOMATIC" ? "AUTOMATIC" : "MANUAL";
+    if (next === state.settings.mode) return;
+    if (!controlEnabled()) {
+        showToast("Firebase is not connected.", "warn");
+        return;
+    }
+    try {
+        await writeFirebase("settings/mode", next);
+        showToast("Mode updated to " + next + ".", "success");
+    } catch (err) {
+        console.error("Failed to write settings/mode", err);
+        showToast("Failed to reach Firebase.", "error");
+    }
+}
+
+async function setThreshold(raw) {
+    const value = clamp(parseInt(raw, 10), 0, 1023);
+    if (!Number.isFinite(value) || !String(raw).trim()) {
+        showToast("Enter a valid threshold (0\u20131023).", "warn");
+        return;
+    }
+    if (!controlEnabled()) {
+        showToast("Firebase is not connected.", "warn");
+        return;
+    }
+    try {
+        await writeFirebase("settings/ldrThreshold", value);
+        showToast("Threshold saved to " + value + ".", "success");
+    } catch (err) {
+        console.error("Failed to write settings/ldrThreshold", err);
+        showToast("Failed to reach Firebase.", "error");
+    }
+}
+
+// =====================================================
+// FIREBASE INITIALIZATION
+// =====================================================
+
+function validateConfig(cfg) {
+    if (!cfg || typeof cfg !== "object") return false;
+    for (const key of ["apiKey", "authDomain", "databaseURL", "projectId"]) {
+        const v = cfg[key];
+        if (typeof v !== "string" || !v.trim()) return false;
+    }
+    return true;
+}
+
+function withTimeout(promise, ms, label) {
+    return Promise.race([
+        promise,
+        new Promise(function (resolve, reject) {
+            setTimeout(function () { reject(new Error("Timed out loading " + label)); }, ms);
+        })
+    ]);
+}
+
+async function loadFirebaseModules() {
+    const [appMod, dbMod, authMod] = await Promise.all([
+        withTimeout(import(FIREBASE_BASE + "/firebase-app.js"), 15000, "firebase-app"),
+        withTimeout(import(FIREBASE_BASE + "/firebase-database.js"), 15000, "firebase-database"),
+        withTimeout(import(FIREBASE_BASE + "/firebase-auth.js"), 15000, "firebase-auth")
+    ]);
+    const app = appMod.initializeApp(firebaseConfig);
+    const db = dbMod.getDatabase(app);
+    const auth = authMod.getAuth(app);
+    return {
+        app: app,
+        db: db,
+        api: dbMod,
+        auth: auth,
+        authMod: authMod
+    };
+}
+
+function chartErrorNotice() {
+    const u = $("chartsUnavailable");
+    if (u) { u.hidden = false; }
+    const wrap = $("chartsWrap");
+    if (wrap) { wrap.hidden = true; }
+}
+
+async function loadChart() {
+    try {
+        const mod = await withTimeout(
+            import("https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.js"),
+            15000,
+            "chart.js"
+        );
+        const ChartClass = mod.default || mod.Chart;
+        if (!ChartClass) { throw new Error("Chart.js export missing"); }
+        const regs = mod.registerables || Object.values(mod).filter(function (v) { return v && typeof v === "object" && v.id; });
+        if (regs && regs.length) ChartClass.register.apply(ChartClass, regs);
+        window.Chart = ChartClass;
+        state.chartsAvailable = true;
+    } catch (err) {
+        console.warn("Chart.js unavailable \u2014 analytics will show a notice.", err);
+        state.chartsAvailable = false;
+        chartErrorNotice();
+    }
+}
+
+// =====================================================
+// SESSION / APPLICATION ENTRY
+// =====================================================
+
+function applySession() {
+    let label = "\u2014";
+    try {
+        const raw = sessionStorage.getItem("iot_session");
+        if (raw) {
+            const s = JSON.parse(raw);
+            if (s && typeof s.email === "string" && s.email.trim()) label = s.email.trim();
+        }
+    } catch (e) { /* ignore */ }
+    setText("userLabel", label);
+}
+
+function openApp() {
+    $("bootScreen").hidden = true;
+    $("app").hidden = false;
+    updateStatus();
+    renderAll();
+}
+
+function initFirebase() {
+    state.configValid = validateConfig(firebaseConfig);
+    if (!state.configValid) {
+        setText("bootMessage", "Configuration required");
+        setTimeout(function () { openApp(); }, 300);
+        return;
+    }
+    setText("bootMessage", "Loading Firebase services\u2026");
+    loadFirebaseModules().then(function (fbApi) {
+        state.fb = fbApi;
+        setText("bootMessage", "Checking authentication\u2026");
+        gateAuth(fbApi);
+    }).catch(function (err) {
+        console.error("Firebase initialization failed", err);
+        state.fb = null;
+        setText("bootMessage", "Firebase unavailable");
+        setTimeout(function () { openApp(); }, 350);
+    });
+}
+
+function gateAuth(fbApi) {
+    var auth = fbApi.auth;
+    var authMod = fbApi.authMod;
+    // If no auth module loaded, allow through (fallback for CDN failure)
+    if (!auth || !authMod) {
+        setText("bootMessage", "Connecting to database\u2026");
+        initDatabaseListeners();
+        openApp();
+        return;
+    }
+    // Listen once for auth state
+    var unsub = authMod.onAuthStateChanged(auth, function (user) {
+        try { unsub(); } catch (e) { /* ignore */ }
+        if (user) {
+            // Signed in — set session from Firebase Auth
+            applyAuthSession(user);
+            setText("bootMessage", "Connecting to database\u2026");
+            initDatabaseListeners();
+            openApp();
+        } else {
+            // Not signed in — allow if session exists (e.g. redirect-based flow)
+            var hasSession = false;
+            try {
+                var raw = sessionStorage.getItem("iot_session");
+                if (raw) { var s = JSON.parse(raw); hasSession = !!(s && s.email); }
+            } catch (e) { /* ignore */ }
+            if (hasSession) {
+                setText("bootMessage", "Connecting to database\u2026");
+                initDatabaseListeners();
+                openApp();
+            } else {
+                setText("bootMessage", "Sign in required");
+                setTimeout(function () { window.location.href = "index.html"; }, 600);
+            }
+        }
+    });
+}
+
+function applyAuthSession(user) {
+    var label = user.displayName || user.email || "\u2014";
+    setText("userLabel", label);
+    try {
+        sessionStorage.setItem("iot_session", JSON.stringify({
+            email: user.email || "",
+            name: user.displayName || "",
+            photo: user.photoURL || "",
+            ts: Date.now()
+        }));
+    } catch (e) { /* ignore */ }
+}
+
+// =====================================================
+// DATABASE
+// =====================================================
+
+function initDatabaseListeners() {
+    if (!state.fb) return;
+    const db = state.fb.db;
+    const api = state.fb.api;
+
+    // Connection state
+    const connRef = api.ref(db, ".info/connected");
+    const connUnsub = api.onValue(connRef, function (snap) {
+        state.fbConnected = snap.val() === true;
+        updateStatus();
+        renderControl();
+        renderAutomation();
+    }, function (err) {
+        console.error("Connection listener failed", err);
+        state.fbConnected = false;
+        updateStatus();
+    });
+    state.unsubs.push(connUnsub);
+
+    // Sensor / device state
+    const sensorRef = api.ref(db, "sensorData");
+    const sensorUnsub = api.onValue(sensorRef, function (snap) {
+        const v = snap.val();
+        if (v) {
+            state.live = normalizeLive(v);
+        } else {
+            resetLive();
+        }
+        scheduleRender();
+    }, function (err) {
+        console.error("sensorData listener failed", err);
+        if (err && err.code && String(err.code).indexOf("PERMISSION_DENIED") !== -1) {
+            showToast("Database access denied. Check your Security Rules.", "error");
+        } else {
+            showToast("Connection interrupted \u2014 waiting for Firebase.", "warn");
+        }
+    });
+    state.unsubs.push(sensorUnsub);
+
+    // Settings (mode + threshold)
+    const settingsRef = api.ref(db, "settings");
+    const settingsUnsub = api.onValue(settingsRef, function (snap) {
+        const v = snap.val();
+        if (v) {
+            state.settings = normalizeSettings(v);
+        } else {
+            state.settings = { mode: "MANUAL", ldrThreshold: 500 };
+        }
+        scheduleRender();
+    }, function (err) {
+        console.error("settings listener failed", err);
+    });
+    state.unsubs.push(settingsUnsub);
+
+    // Historical logs
+    const logsQuery = api.query(api.ref(db, "logs"), api.limitToLast(200));
+    const logsUnsub = api.onValue(logsQuery, function (snap) {
+        const arr = [];
+        snap.forEach(function (child) {
+            const rec = normalizeLog(child.val());
+            if (rec) arr.push(rec);
+        });
+        arr.sort(function (a, b) { return b.timestamp - a.timestamp; });
+        state.logs = arr.slice(0, 300);
+        scheduleRender();
+    }, function (err) {
+        console.error("logs listener failed", err);
+    });
+    state.unsubs.push(logsUnsub);
+}
+
+function resetLive() {
+    state.live = {
+        temperature: null,
+        humidity: null,
+        ldr: null,
+        bulbState: null,
+        mode: null,
+        timestamp: null
+    };
+}
+
+function cleanupListeners() {
+    state.unsubs.forEach(function (u) {
+        try { if (typeof u === "function") u(); } catch (e) { /* ignore */ }
+    });
+    state.unsubs = [];
+}
+
+// =====================================================
+// NAVIGATION (scroll spy)
+// =====================================================
+
+function setupScrollSpy() {
+    const links = Array.prototype.slice.call(document.querySelectorAll("#topNav a[data-section]"));
+    const map = {};
+    links.forEach(function (a) { map[a.dataset.section] = a; });
+
+    const targets = links.map(function (a) {
+        return document.getElementById("sec-" + a.dataset.section);
+    }).filter(Boolean);
+
+    function setActive(id) {
+        links.forEach(function (a) {
+            const on = a.dataset.section === id;
+            a.classList.toggle("is-active", on);
+            if (on) a.setAttribute("aria-current", "true");
+            else a.removeAttribute("aria-current");
+        });
+    }
+
+    function current() {
+        let out = null;
+        let best = -Infinity;
+        targets.forEach(function (sec) {
+            const top = sec.getBoundingClientRect().top;
+            if (top < 200 && top > best) { best = top; out = sec.id.replace("sec-", ""); }
+        });
+        if (!out) out = "now";
+        setActive(out);
+    }
+
+    document.addEventListener("scroll", function () { current(); }, { passive: true });
+    current();
+}
+
+// =====================================================
+// EVENT WIRING
+// =====================================================
+
+function wireUi() {
+    // Logout
+    $("btnLogout").addEventListener("click", logout);
+
+    // Bulb control
+    $("btnBulbOn").addEventListener("click", function () { setBulb(true); });
+    $("btnBulbOff").addEventListener("click", function () { setBulb(false); });
+
+    // Mode selection
+    $("segManual").addEventListener("click", function () { setMode("MANUAL"); });
+    $("segAuto").addEventListener("click", function () { setMode("AUTOMATIC"); });
+
+    // Threshold
+    $("btnThresholdSave").addEventListener("click", function () {
+        setThreshold($("autoThresholdInput").value);
+    });
+    $("autoThresholdInput").addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            setThreshold($("autoThresholdInput").value);
+        }
+    });
+
+    // CSV export
+    $("btnExportCSV").addEventListener("click", exportCSV);
+
+    // Accordions
+    document.querySelectorAll(".acc__btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            const item = btn.closest(".acc__item");
+            const open = item.classList.toggle("is-open");
+            btn.setAttribute("aria-expanded", open ? "true" : "false");
+        });
+    });
+
+    setupScrollSpy();
+}
+
+function logout() {
+    cleanupListeners();
+    try { sessionStorage.removeItem("iot_session"); } catch (e) { /* ignore */ }
+    const navToLogin = function () { window.location.href = "index.html"; };
+    // Sign out of Firebase Auth before leaving, so the session truly ends.
+    if (state.fb && state.fb.auth && state.fb.authMod) {
+        const fallback = setTimeout(navToLogin, 2000);
+        state.fb.authMod.signOut(state.fb.auth)
+            .then(function () { clearTimeout(fallback); navToLogin(); })
+            .catch(function () { clearTimeout(fallback); navToLogin(); });
+    } else {
+        navToLogin();
+    }
+}
+
+// =====================================================
+// SCHEDULED RENDERING
+// =====================================================
+
+function scheduleRender() {
+    if (state.renderQueued) return;
+    state.renderQueued = true;
+    requestAnimationFrame(function () {
+        state.renderQueued = false;
+        renderAll();
+    });
+}
+
+// =====================================================
+// STARTUP
+// =====================================================
+
+function start() {
+    setText("bootMessage", "Connecting to system\u2026");
+    wireUi();
+    applySession();
+    loadChart();
+    initFirebase();
+}
+
+function ready(fn) {
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", fn);
+    } else {
+        fn();
+    }
+}
+
+ready(start);
+</script>
+</body>
+</html>

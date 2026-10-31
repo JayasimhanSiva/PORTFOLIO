@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<meta name="description" content="Smart Environment — real-time environmental monitoring and appliance control. DHT11, LDR, ESP32, Firebase and a relay, presented as one product.">
+<meta name="theme-color" content="#ffffff">
+<title>Smart Environment — Environmental Monitoring &amp; Appliance Control</title>
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="%230d1117"/><rect x="9" y="9" width="14" height="14" rx="3" fill="%23f5f5f7"/><circle cx="16" cy="16" r="4" fill="%230d1117"/></svg>'>
+<style>
+/* ==========================================================================
+   SMART ENVIRONMENT — product story
+   ========================================================================== */
+
+:root {
+    --page: #ffffff;
+    --band: #f5f5f7;
+    --dark: #1d1d1f;
+    --dark-2: #000000;
+    --ink: #1d1d1f;
+    --ink-2: #6e6e73;
+    --ink-3: #86868b;
+    --line: #e8e8ed;
+    --line-strong: #d2d2d7;
+    --accent: #000000;
+    --radius: 8px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+            "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Cascadia Code",
+            Consolas, "Liberation Mono", monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
+
+html { scroll-behavior: smooth; }
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+body {
+    margin: 0;
+    background: var(--page);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+::selection { background: rgba(0, 0, 0, 0.12); }
+
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+a { color: inherit; text-decoration: none; }
+
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* --------------------------------------------------------------------------
+   Header
+   -------------------------------------------------------------------------- */
+
+.head {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    background: rgba(255, 255, 255, 0.82);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    backdrop-filter: saturate(1.4) blur(14px);
+    border-bottom: 1px solid transparent;
+}
+
+.head--scrolled { border-bottom-color: var(--line); }
+
+.head__in {
+    max-width: 1160px;
+    margin: 0 auto;
+    height: 52px;
+    padding: 0 28px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+.wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+}
+
+.wordmark__mark {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: var(--ink);
+    display: grid;
+    place-items: center;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #fff;
+}
+
+.head__nav {
+    display: flex;
+    align-items: baseline;
+    gap: 26px;
+    margin: 0 auto;
+}
+
+.head__nav a {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--ink-2);
+}
+
+.head__nav a:hover { color: var(--ink); }
+
+.head__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 980px;
+    background: var(--ink);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 12px 20px;
+    min-height: 44px;
+    transition: background 0.15s;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.head__cta:hover { background: #2c2c2e; }
+.head__cta:active { background: #1d1d1f; }
+
+@media (max-width: 760px) {
+    .head__nav { display: none; }
+    .head__in { gap: 16px; }
+}
+
+.head__auth {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.head__user {
+    font-size: 12px;
+    color: var(--ink-2);
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.head__signout {
+    font-size: 12px;
+    color: var(--ink-3);
+    padding: 8px 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.head__signout:hover { color: var(--ink); }
+.head__signout:active { color: var(--ink); }
+
+@media (max-width: 420px) {
+    .head__in { padding: 0 18px; }
+    .head__cta { font-size: 12.5px; padding: 10px 16px; }
+    .head__user { display: none; }
+}
+
+/* --------------------------------------------------------------------------
+   Hero
+   -------------------------------------------------------------------------- */
+
+.hero {
+    padding: calc(52px + 120px) 28px 96px;
+    max-width: 1160px;
+    margin: 0 auto;
+}
+
+.eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+
+.hero h1 {
+    margin: 26px 0 0;
+    max-width: 11em;
+    font-size: clamp(44px, 8vw, 96px);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    font-weight: 700;
+}
+
+.hero__sub {
+    margin: 30px 0 0;
+    max-width: 30em;
+    font-size: 19px;
+    line-height: 1.6;
+    color: var(--ink-2);
+}
+
+.hero__actions {
+    margin-top: 44px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 980px;
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    padding: 16px 28px;
+    min-height: 48px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.btn--ink { background: var(--ink); color: #fff; border: 1px solid var(--ink); }
+.btn--ink:hover { background: #2c2c2e; border-color: #2c2c2e; }
+.btn--ink:active { background: #1d1d1f; }
+
+.btn--text {
+    background: transparent;
+    color: var(--ink);
+    border: none;
+    padding: 16px 16px;
+    min-height: 48px;
+}
+
+.btn--text:hover { color: var(--ink-2); }
+.btn--text:active { color: var(--ink); }
+
+@media (max-width: 560px) {
+    .hero__actions { flex-direction: column; align-items: stretch; gap: 12px; }
+    .btn { width: 100%; justify-content: center; }
+}
+
+/* Measures band */
+
+.measures {
+    margin-top: 84px;
+    border-top: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.measure {
+    padding: 26px 26px 0 0;
+    border-left: 1px solid var(--line);
+    padding-left: 26px;
+}
+
+.measure:first-child { border-left: none; padding-left: 0; }
+
+.measure__label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+}
+
+.measure__value {
+    margin-top: 10px;
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+@media (max-width: 760px) {
+    .hero { padding-top: calc(52px + 72px); }
+    .measures { grid-template-columns: repeat(2, 1fr); row-gap: 26px; }
+    .measure:nth-child(3) { border-left: none; padding-left: 0; }
+}
+
+@media (max-width: 420px) {
+    .hero { padding-left: 18px; padding-right: 18px; }
+    .measures { grid-template-columns: 1fr; row-gap: 22px; }
+    .measure, .measure:nth-child(3) { border-left: none; padding-left: 0; }
+}
+
+/* --------------------------------------------------------------------------
+   Bands
+   -------------------------------------------------------------------------- */
+
+.band { padding: 128px 28px; }
+
+.band--tint { background: var(--band); }
+
+.band__in { max-width: 1160px; margin: 0 auto; }
+
+.story {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 72px;
+}
+
+.story__index {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-3);
+    letter-spacing: 0.08em;
+    margin-bottom: 14px;
+}
+
+.story__title h2 {
+    margin: 0;
+    font-size: clamp(30px, 4.5vw, 48px);
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    font-weight: 700;
+}
+
+.story__title p {
+    margin: 18px 0 0;
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-2);
+    max-width: 26em;
+}
+
+.story__body { display: grid; gap: 26px; align-content: start; }
+
+.item {
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+}
+
+.item h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+}
+
+.item h3 .mono {
+    font-size: 13px;
+    color: var(--ink-3);
+    font-weight: 400;
+    margin-left: 10px;
+}
+
+.item p {
+    margin: 10px 0 0;
+    max-width: 42em;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--ink-2);
+}
+
+/* --------------------------------------------------------------------------
+   Dark band
+   -------------------------------------------------------------------------- */
+
+.band--dark {
+    background: var(--dark-2);
+    color: #fff;
+    padding: 160px 28px;
+}
+
+.band--dark .eyebrow { color: #fff; opacity: 0.6; }
+
+.band--dark h2 {
+    margin: 26px 0 0;
+    max-width: 14em;
+    font-size: clamp(36px, 6vw, 72px);
+    letter-spacing: -0.03em;
+    line-height: 1.03;
+    font-weight: 700;
+}
+
+.band--dark .story__body { margin-top: 60px; }
+
+.dark-item { border-top: 1px solid rgba(255,255,255,0.16); padding-top: 24px; }
+
+.dark-item h3 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.dark-item h3 .mono { color: rgba(255,255,255,0.5); font-size: 13px; margin-left: 10px; font-weight: 400; }
+
+.dark-item p {
+    margin: 10px 0 0;
+    font-size: 15px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.65);
+    max-width: 40em;
+}
+
+.state-line {
+    margin-top: 56px;
+    display: inline-flex;
+    align-items: center;
+    gap: 18px;
+    border: 1px solid rgba(255,255,255,0.24);
+    border-radius: 8px;
+    padding: 14px 22px;
+    font-family: var(--mono);
+    font-size: 14px;
+}
+
+.state-line .cur { color: rgba(255,255,255,0.45); }
+.state-line .arrow { color: rgba(255,255,255,0.35); }
+
+/* --------------------------------------------------------------------------
+   Architecture band (white)
+   -------------------------------------------------------------------------- */
+
+.arch-band {
+    padding: 140px 28px;
+    max-width: 1160px;
+    margin: 0 auto;
+}
+
+.arch-band .eyebrow { margin-top: 12px; }
+
+.arch-band h2 {
+    margin: 24px 0 0;
+    font-size: clamp(30px, 4.5vw, 48px);
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    font-weight: 700;
+}
+
+.arch-band p.lead {
+    margin: 18px 0 0;
+    max-width: 34em;
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-2);
+}
+
+.arch {
+    margin-top: 72px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.arch__node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.arch__node b {
+    font-size: 20px;
+    font-weight: 650;
+    letter-spacing: 0.02em;
+}
+
+.arch__node span {
+    font-size: 13px;
+    color: var(--ink-3);
+    letter-spacing: 0.02em;
+}
+
+.arch__node--accent b { color: var(--accent); }
+
+.arch__link {
+    width: 1px;
+    height: 40px;
+    background: var(--line-strong);
+}
+
+/* --------------------------------------------------------------------------
+   CTA
+   -------------------------------------------------------------------------- */
+
+.cta {
+    padding: 180px 28px;
+    text-align: center;
+}
+
+.cta .eyebrow { color: var(--ink-3); }
+
+.cta h2 {
+    margin: 22px 0 0;
+    font-size: clamp(36px, 6vw, 72px);
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    font-weight: 700;
+}
+
+.cta__actions { margin-top: 44px; }
+
+.cta__note {
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--ink-3);
+}
+
+/* --------------------------------------------------------------------------
+   Footer
+   -------------------------------------------------------------------------- */
+
+.foot {
+    border-top: 1px solid var(--line);
+    padding: 44px 28px 56px;
+}
+
+.foot__in {
+    max-width: 1160px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.foot__brand { font-size: 12.5px; font-weight: 600; letter-spacing: 0.02em; }
+
+.foot__meta {
+    font-size: 12px;
+    color: var(--ink-3);
+    letter-spacing: 0.02em;
+}
+
+.foot__meta .sep { margin: 0 10px; color: var(--line-strong); }
+
+@media (max-width: 760px) {
+    .story { grid-template-columns: 1fr; gap: 40px; }
+    .band { padding: 88px 20px; }
+    .band--dark { padding: 110px 20px; }
+    .arch-band { padding: 96px 20px; }
+    .cta { padding: 120px 20px; }
+    .foot__in { justify-content: center; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<header class="head" id="head">
+    <div class="head__in">
+        <a class="wordmark" href="landing.html">
+            <span class="wordmark__mark">SE</span>
+            <span>Smart Environment</span>
+        </a>
+        <nav class="head__nav" aria-label="Page">
+            <a href="#sense">Sense</a>
+            <a href="#connect">Connect</a>
+            <a href="#decide">Decide</a>
+            <a href="#act">Act</a>
+            <a href="#architecture">Architecture</a>
+        </nav>
+        <a class="head__cta" href="dashboard.html">Open dashboard &rarr;</a>
+        <div class="head__auth" id="headAuth" hidden>
+            <span class="head__user mono" id="headUser"></span>
+            <a class="head__signout" href="#" id="headSignout">Sign out</a>
+        </div>
+    </div>
+</header>
+
+<main>
+
+    <section class="hero">
+        <div class="eyebrow">Smart Environment</div>
+        <h1>See the environment. Control what responds to it.</h1>
+        <p class="hero__sub">
+            Temperature, humidity and ambient light are measured in real time. A threshold decides
+            when a 230&nbsp;V lamp should respond — and you override it whenever you want to.
+        </p>
+        <div class="hero__actions">
+            <a class="btn btn--ink" href="dashboard.html">Open dashboard &rarr;</a>
+            <a class="btn btn--text" href="#sense">Explore the system &darr;</a>
+        </div>
+
+        <div class="measures">
+            <div class="measure">
+                <div class="measure__label">Measure</div>
+                <div class="measure__value">Temperature</div>
+            </div>
+            <div class="measure">
+                <div class="measure__label">Measure</div>
+                <div class="measure__value">Humidity</div>
+            </div>
+            <div class="measure">
+                <div class="measure__label">Measure</div>
+                <div class="measure__value">Ambient light</div>
+            </div>
+            <div class="measure">
+                <div class="measure__label">Control</div>
+                <div class="measure__value">230 V lamp</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="band band--tint" id="sense">
+        <div class="band__in">
+            <div class="story">
+                <div class="story__title">
+                    <div class="story__index">01</div>
+                    <h2>Sense.</h2>
+                    <p>The ESP32 reads two sensors and publishes their values to Firebase.</p>
+                </div>
+                <div class="story__body">
+                    <div class="item">
+                        <h3>DHT11 <span class="mono">TEMPERATURE · HUMIDITY</span></h3>
+                        <p>Measures air temperature in degrees Celsius and relative humidity in percent.
+                           A single digital reading, published continuously in real time.</p>
+                    </div>
+                    <div class="item">
+                        <h3>LDR <span class="mono">AMBIENT LIGHT</span></h3>
+                        <p>An analog light-dependent resistor reports ambient brightness on a 0–1023 scale.
+                           This value is what drives automatic control.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="band" id="connect">
+        <div class="band__in">
+            <div class="story">
+                <div class="story__title">
+                    <div class="story__index">02</div>
+                    <h2>Connect.</h2>
+                    <p>The device and the interface meet in a single live source of truth.</p>
+                </div>
+                <div class="story__body">
+                    <div class="item">
+                        <h3>ESP32 <span class="mono">Wi-Fi</span></h3>
+                        <p>An ESP32 microcontroller joins the local network and maintains the link between
+                           the physical world and the service layer.</p>
+                    </div>
+                    <div class="item">
+                        <h3>Firebase <span class="mono">REALTIME DATABASE</span></h3>
+                        <p>Sensor readings, operating mode and appliance state live in Firebase. Every
+                           listener — the dashboard and the device — sees changes the instant they land.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="band band--tint" id="decide">
+        <div class="band__in">
+            <div class="story">
+                <div class="story__title">
+                    <div class="story__index">03</div>
+                    <h2>Decide.</h2>
+                    <p>Control happens two ways — you decide, or the environment decides.</p>
+                </div>
+                <div class="story__body">
+                    <div class="item">
+                        <h3>Manual <span class="mono">ON · OFF</span></h3>
+                        <p>From the dashboard you send an explicit command. The device carries it to the
+                           relay and the relay switches the lamp.</p>
+                    </div>
+                    <div class="item">
+                        <h3>Automatic <span class="mono">LDR &lt; THRESHOLD</span></h3>
+                        <p>Below a configured light threshold the lamp turns on; at or above it, the lamp
+                           turns off. The rule is evaluated continuously from live readings.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="band band--dark" id="act">
+        <div class="band__in">
+            <div class="band__in">
+                <div class="eyebrow">04 · Act</div>
+                <h2>Control the physical world.</h2>
+                <div class="story__body" style="margin-top:52px">
+                    <div class="dark-item">
+                        <h3>Relay <span class="mono">GPIO SWITCH</span></h3>
+                        <p>The ESP32 drives a relay module that opens and closes the mains circuit feeding a 230&nbsp;V bulb.</p>
+                    </div>
+                    <div class="dark-item">
+                        <h3>Smart bulb <span class="mono">230 V</span></h3>
+                        <p>A lamp becomes addressable: on, off, or governed by the light it sits in.</p>
+                    </div>
+                </div>
+                <div class="state-line" aria-hidden="true">
+                    <span class="cur">DARK</span>
+                    <span class="arrow">&rarr;</span>
+                    <span>ON</span>
+                    <span class="arrow">&nbsp;</span>
+                    <span class="cur">BRIGHT</span>
+                    <span class="arrow">&rarr;</span>
+                    <span>OFF</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="arch-band" id="architecture">
+        <div class="eyebrow">System Architecture</div>
+        <h2>One path. Two directions.</h2>
+        <p class="lead">
+            Readings travel upward from the sensors to the dashboard. Commands travel back down to the
+            actuator. Firebase is the single point every component reads from and writes to.
+        </p>
+
+        <div class="arch">
+            <div class="arch__node"><b>Sensors</b><span>DHT11 · LDR</span></div>
+            <div class="arch__link"></div>
+            <div class="arch__node"><b>ESP32</b><span>microcontroller · Wi-Fi</span></div>
+            <div class="arch__link"></div>
+            <div class="arch__node"><b>Wi-Fi</b><span>local network</span></div>
+            <div class="arch__link"></div>
+            <div class="arch__node arch__node--accent"><b>Firebase</b><span>Realtime Database · source of truth</span></div>
+            <div class="arch__link"></div>
+            <div class="arch__node"><b>Dashboard</b><span>monitor · decide · automate</span></div>
+            <div class="arch__link"></div>
+            <div class="arch__node"><b>Relay</b><span>switched by command</span></div>
+            <div class="arch__link"></div>
+            <div class="arch__node"><b>230 V Bulb</b><span>the controlled appliance</span></div>
+        </div>
+    </section>
+
+    <section class="cta" id="open">
+        <div class="eyebrow">Now</div>
+        <h2>Ready to see the system?</h2>
+        <div class="cta__actions">
+            <a class="btn btn--ink" href="dashboard.html">Open dashboard &rarr;</a>
+        </div>
+        <p class="cta__note">The dashboard shows real state only — empty until the device reports.</p>
+    </section>
+
+</main>
+
+<footer class="foot">
+    <div class="foot__in">
+        <span class="foot__brand">Smart Environment &amp; Appliance Control</span>
+        <span class="foot__meta">
+            ESP32 <span class="sep">·</span> Firebase <span class="sep">·</span> DHT11
+            <span class="sep">·</span> LDR <span class="sep">·</span> Relay
+            <span class="sep">·</span> IoT Monitoring &amp; Automation Project
+            <span class="sep">·</span> &copy; 2026
+        </span>
+    </div>
+</footer>
+
+<script>
+document.addEventListener("scroll", function () {
+    const h = document.getElementById("head");
+    if (h) h.classList.toggle("head--scrolled", window.scrollY > 8);
+}, { passive: true });
+</script>
+
+<script>
+// =====================================================
+// SESSION-AWARE HEADER (landing page)
+// Shows who is signed in; the dashboard itself enforces
+// the Google auth gate, so this is purely informational.
+// =====================================================
+
+const FIREBASE_VERSION = "10.12.2";
+const FIREBASE_BASE = "https://www.gstatic.com/firebasejs/" + FIREBASE_VERSION;
+
+function readSessionLabel() {
+    try {
+        const raw = sessionStorage.getItem("iot_session");
+        if (!raw) return "";
+        const s = JSON.parse(raw);
+        if (s && (s.name || s.email)) return s.name || s.email;
+    } catch (e) { /* ignore */ }
+    return "";
+}
+
+let _landingAuthRef = null;
+
+function signOutOfIot() {
+    try { sessionStorage.removeItem("iot_session"); } catch (err) { /* ignore */ }
+    const box = document.getElementById("headAuth");
+    if (box) box.hidden = true;
+    if (_landingAuthRef && _landingAuthRef.auth && _landingAuthRef.authMod) {
+        _landingAuthRef.authMod.signOut(_landingAuthRef.auth).catch(function () { /* ignore */ });
+    }
+    window.location.href = "index.html";
+}
+
+function renderHeaderAuth(user) {
+    const box = document.getElementById("headAuth");
+    const label = document.getElementById("headUser");
+    if (!box || !label) return;
+
+    if (user) {
+        label.textContent = user.displayName || user.email || "";
+        box.hidden = false;
+        return;
+    }
+
+    // No Firebase Auth available (or signed out): fall back to the local session,
+    // which preserves the signing-out state across redirect sign-in.
+    const sessionLabel = readSessionLabel();
+    if (sessionLabel) {
+        label.textContent = sessionLabel;
+        box.hidden = false;
+    }
+}
+
+(function () {
+    const box = document.getElementById("headAuth");
+    const signout = document.getElementById("headSignout");
+    if (!box || !signout) return;
+    signout.addEventListener("click", function (e) {
+        e.preventDefault();
+        signOutOfIot();
+    });
+    import(FIREBASE_BASE + "/firebase-app.js")
+        .then(function (appMod) { return import(FIREBASE_BASE + "/firebase-auth.js").then(function (authMod) {
+            return { appMod: appMod, authMod: authMod };
+        }); })
+        .then(function (mods) {
+            const app = mods.appMod.initializeApp({
+                apiKey: "YOUR_API_KEY",
+                authDomain: "dashboard-iot-d7f6c.firebaseapp.com",
+                databaseURL: "https://dashboard-iot-d7f6c-default-rtdb.firebaseio.com",
+                projectId: "dashboard-iot-d7f6c",
+                storageBucket: "dashboard-iot-d7f6c.firebasestorage.app",
+                messagingSenderId: "16305837357",
+                appId: "1:16305837357:web:9d69f5e1ffe768ad45afa4"
+            });
+            const auth = mods.authMod.getAuth(app);
+            _landingAuthRef = { auth: auth, authMod: mods.authMod };
+            return mods.authMod.onAuthStateChanged(auth, function (user) {
+                renderHeaderAuth(user);
+            });
+        })
+        .catch(function () {
+            // Firebase Auth unavailable — still show the session label if present
+            renderHeaderAuth(null);
+        });
+})();
+</script>
+
+</body>
+</html>

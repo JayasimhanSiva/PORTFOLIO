@@ -17,3 +17,7 @@ Personal portfolio website: projects, ProtoSem lab work, and about.
 ## Live site
 
 Served via GitHub Pages from this repository's `main` branch.
+
+## Source code
+
+Week 7 project source is in [`source/week-7`](source/week-7).

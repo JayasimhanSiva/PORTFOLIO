@@ -1,0 +1,807 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<meta name="description" content="Smart Environment — sign in to access environmental monitoring and appliance control.">
+<meta name="theme-color" content="#f5f5f7">
+<title>Sign In — Smart Environment</title>
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="%230d1117"/><rect x="9" y="9" width="14" height="14" rx="3" fill="%23f5f5f7"/><circle cx="16" cy="16" r="4" fill="%230d1117"/></svg>'>
+<style>
+/* ==========================================================================
+   SMART ENVIRONMENT — sign in
+   Light, monochrome, product-grade. Fields first, Google beneath.
+   ========================================================================== */
+
+:root {
+    --page: #f5f5f7;
+    --surface: #ffffff;
+    --ink: #1d1d1f;
+    --ink-2: #6e6e73;
+    --ink-3: #86868b;
+    --line: #e8e8ed;
+    --line-strong: #d2d2d7;
+    --accent: #000000;
+    --accent-soft: rgba(0, 0, 0, 0.06);
+    --danger: #c4302b;
+    --radius-input: 10px;
+    --radius-pill: 980px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+            "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Cascadia Code",
+            Consolas, "Liberation Mono", monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--page);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+::selection { background: rgba(0, 0, 0, 0.12); }
+
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* --------------------------------------------------------------------------
+   Header
+   -------------------------------------------------------------------------- */
+
+.head {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    padding: 20px 28px 0;
+}
+
+.head__in {
+    max-width: 1160px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+}
+.wordmark:hover { text-decoration: none; }
+
+.wordmark__mark {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: var(--ink);
+    display: grid;
+    place-items: center;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #fff;
+}
+
+/* --------------------------------------------------------------------------
+   Auth composition
+   -------------------------------------------------------------------------- */
+
+.auth {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 28px 64px;
+}
+
+.auth__col {
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.tile {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 30px;
+    border-radius: 15px;
+    background: var(--ink);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-size: 13px;
+    font-weight: 650;
+    letter-spacing: 0.06em;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
+}
+
+.eyebrow {
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+}
+
+.auth h1 {
+    margin: 14px 0 0;
+    font-size: clamp(32px, 4.6vw, 44px);
+    line-height: 1.06;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+}
+
+.auth__sub {
+    margin: 16px 0 0;
+    max-width: 30em;
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--ink-2);
+    font-size: 15.5px;
+    line-height: 1.6;
+}
+
+/* --------------------------------------------------------------------------
+   Form
+   -------------------------------------------------------------------------- */
+
+.auth__form { margin-top: 38px; text-align: left; }
+
+.field { margin-bottom: 16px; }
+
+.field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 7px;
+}
+
+.input {
+    width: 100%;
+    height: 48px;
+    appearance: none;
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-input);
+    padding: 0 14px;
+    font-family: var(--font);
+    font-size: 15px;
+    color: var(--ink);
+    transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+}
+
+.input::placeholder { color: var(--ink-3); }
+
+.input:hover { border-color: #c7c7cc; }
+
+.input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.07);
+}
+
+@media (max-width: 560px) {
+    .input { height: 52px; font-size: 16px; padding: 0 16px; }
+}
+
+/* Password visibility toggle */
+
+.field--pass .input { padding-right: 64px; }
+
+.passwrap { position: relative; }
+
+.pass-toggle {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    appearance: none;
+    background: transparent;
+    border: none;
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-3);
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+}
+
+.pass-toggle:hover { color: var(--ink); background: var(--accent-soft); }
+
+/* --------------------------------------------------------------------------
+   Buttons
+   -------------------------------------------------------------------------- */
+
+.btn {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 52px;
+    border-radius: var(--radius-pill);
+    font-family: var(--font);
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    padding: 0 24px;
+    cursor: pointer;
+    transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.04s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.btn:active { transform: scale(0.992); }
+.btn:disabled { opacity: 0.5; cursor: default; transform: none; }
+
+.btn--dark {
+    margin-top: 6px;
+    background: var(--ink);
+    color: #fff;
+    border: 1px solid var(--ink);
+}
+
+.btn--dark:hover:not(:disabled) { background: #2c2c2e; border-color: #2c2c2e; }
+
+.btn--google {
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--line-strong);
+}
+
+.btn--google:hover:not(:disabled) { background: #f0f0f2; border-color: #c7c7cc; }
+.btn--google:active:not(:disabled) { background: #e8e8ed; }
+
+.btn__icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 560px) {
+    .auth { padding-top: 136px; }
+    .auth__col { max-width: 100%; }
+    .foot__in { justify-content: center; text-align: center; }
+    .input { height: 52px; font-size: 16px; padding: 0 16px; }
+    .pass-toggle { font-size: 13px; padding: 10px 12px; }
+    .btn { height: 52px; font-size: 16px; }
+    .btn--google { height: 52px; font-size: 16px; }
+    .btn__icon { width: 20px; height: 20px; }
+}
+
+/* --------------------------------------------------------------------------
+   Divider — "or"
+   -------------------------------------------------------------------------- */
+
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 26px 0;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+}
+
+.divider span {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+}
+
+/* --------------------------------------------------------------------------
+   Sign-in / sign-up switch
+   -------------------------------------------------------------------------- */
+
+.auth__switch {
+    margin: 24px 0 0;
+    font-size: 13px;
+    color: var(--ink-2);
+}
+
+.auth__switch .link {
+    appearance: none;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: var(--font);
+    font-size: inherit;
+    font-weight: 500;
+    color: var(--ink);
+    cursor: pointer;
+}
+
+.auth__switch .link:hover { text-decoration: underline; }
+
+/* --------------------------------------------------------------------------
+   Status
+   -------------------------------------------------------------------------- */
+
+.auth__status {
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--ink-3);
+    min-height: 20px;
+    line-height: 1.5;
+}
+
+.auth__status--error { color: var(--danger); }
+.auth__status--ok { color: var(--ink-2); }
+
+/* --------------------------------------------------------------------------
+   Config notice (only when configuration is missing)
+   -------------------------------------------------------------------------- */
+
+.config-notice {
+    margin-top: 24px;
+    padding: 16px 20px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-input);
+    background: var(--surface);
+    font-size: 13px;
+    color: var(--ink-2);
+    line-height: 1.6;
+    text-align: left;
+}
+
+.config-notice b { color: var(--ink); font-weight: 600; }
+
+/* --------------------------------------------------------------------------
+   Foot
+   -------------------------------------------------------------------------- */
+
+.foot {
+    padding: 0 28px 40px;
+}
+
+.foot__in {
+    max-width: 1160px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--ink-3);
+    letter-spacing: 0.02em;
+}
+
+/* --------------------------------------------------------------------------
+   Motion (subtle; disabled when reduced motion is requested)
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+    .auth > .auth__col {
+        animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    }
+    .auth__form .field:nth-child(1) { animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.05s both; }
+    .auth__form .field:nth-child(2) { animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.1s both; }
+    .auth__form .field:nth-child(3) { animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.15s both; }
+    .auth__form .btn { animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.2s both; }
+    .divider { animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.25s both; }
+    .btn--google { animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s both; }
+    .auth__switch { animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.35s both; }
+
+    @keyframes rise {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: none; }
+    }
+}
+
+@media (max-width: 560px) {
+    .auth { padding-top: 136px; }
+    .auth__col { max-width: 100%; }
+    .foot__in { justify-content: center; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<header class="head">
+    <div class="head__in">
+        <a class="wordmark" href="landing.html">
+            <span class="wordmark__mark">SE</span>
+            <span>Smart Environment</span>
+        </a>
+    </div>
+</header>
+
+<main class="auth">
+    <div class="auth__col">
+        <div class="tile" aria-hidden="true">SE</div>
+        <div class="eyebrow">Smart Environment</div>
+        <h1 id="authTitle">Welcome back.</h1>
+        <p class="auth__sub" id="authSub">
+            Sign in to check your environment and control your appliances.
+        </p>
+
+        <form class="auth__form" id="authForm" novalidate autocomplete="on">
+            <div class="field">
+                <label for="authEmail">Email</label>
+                <input class="input" type="email" id="authEmail" name="email"
+                       placeholder="you@example.com" autocomplete="email"
+                       spellcheck="false" autocapitalize="off" autocorrect="off"
+                       required autofocus>
+            </div>
+
+            <div class="field">
+                <label for="authPass">Password</label>
+                <div class="passwrap">
+                    <input class="input" type="password" id="authPass" name="password"
+                           placeholder="Your password" autocomplete="current-password"
+                           required>
+                    <button class="pass-toggle" type="button" id="passToggle"
+                            aria-label="Show password"><span>Show</span></button>
+                </div>
+            </div>
+
+            <div class="field" id="confirmField" hidden>
+                <label for="authConfirm">Confirm password</label>
+                <input class="input" type="password" id="authConfirm" name="confirm"
+                       placeholder="Repeat your password" autocomplete="new-password"
+                       required disabled>
+            </div>
+
+            <button class="btn btn--dark" type="submit" id="authSubmit">SIGN IN</button>
+        </form>
+
+        <div class="divider" role="separator" aria-hidden="true">
+            <span>Or</span>
+        </div>
+
+        <button class="btn btn--google" type="button" id="googleBtn">
+            <svg class="btn__icon" viewBox="0 0 24 24" fill="none">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            Sign in with Google
+        </button>
+
+        <p class="auth__switch" id="authSwitch">
+            New here? <button type="button" class="link" id="switchBtn">Create an account</button>
+        </p>
+
+        <div class="auth__status" id="authStatus" role="status" aria-live="polite"></div>
+
+        <div class="config-notice" id="configNotice" hidden>
+            <b>Firebase configuration required.</b>
+            Replace the placeholder values at the top of
+            <code class="mono">index.html</code> with your real Firebase web app config
+            before sign-in will work.
+        </div>
+    </div>
+</main>
+
+<footer class="foot">
+    <div class="foot__in">
+        <span>ESP32 &middot; Firebase &middot; DHT11 &middot; LDR &middot; Relay</span>
+        <span>IoT Monitoring &amp; Automation Project &middot; &copy; 2026</span>
+    </div>
+</footer>
+
+<script>
+// =====================================================
+// FIREBASE CONFIGURATION
+// =====================================================
+
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "dashboard-iot-d7f6c.firebaseapp.com",
+    databaseURL: "https://dashboard-iot-d7f6c-default-rtdb.firebaseio.com",
+    projectId: "dashboard-iot-d7f6c",
+    storageBucket: "dashboard-iot-d7f6c.firebasestorage.app",
+    messagingSenderId: "16305837357",
+    appId: "1:16305837357:web:9d69f5e1ffe768ad45afa4"
+};
+
+const PLACEHOLDERS = ["YOUR_API_KEY", "YOUR_APP_ID", "YOUR_PROJECT_ID"];
+const CONFIG_VALID = !PLACEHOLDERS.some(function (p) {
+    return String(firebaseConfig.apiKey).includes(p) ||
+           String(firebaseConfig.appId).includes(p) ||
+           String(firebaseConfig.projectId).includes(p);
+});
+
+const FIREBASE_VERSION = "10.12.2";
+const FIREBASE_BASE = "https://www.gstatic.com/firebasejs/" + FIREBASE_VERSION;
+
+// =====================================================
+// STATE
+// =====================================================
+
+let authMode = "signin";        // "signin" | "signup"
+let firebaseModules = null;     // lazy-loaded { app, auth, authMod }
+let busy = false;
+
+// =====================================================
+// UI HELPERS
+// =====================================================
+
+const $ = function (id) { return document.getElementById(id); };
+
+function setStatus(msg, kind) {
+    const el = $("authStatus");
+    if (!el) return;
+    el.textContent = msg || "";
+    el.className = "auth__status" + (kind === "error" ? " auth__status--error"
+                                : kind === "ok" ? " auth__status--ok"
+                                : "");
+}
+
+function clearStatus() { setStatus("", ""); }
+
+// =====================================================
+// FIREBASE (lazy init)
+// =====================================================
+
+async function ensureFirebase() {
+    if (firebaseModules) return firebaseModules;
+    const appMod = await import(FIREBASE_BASE + "/firebase-app.js");
+    const authMod = await import(FIREBASE_BASE + "/firebase-auth.js");
+    const app = appMod.initializeApp(firebaseConfig);
+    const auth = authMod.getAuth(app);
+    firebaseModules = { app: app, auth: auth, authMod: authMod };
+    return firebaseModules;
+}
+
+// =====================================================
+// SESSION
+// =====================================================
+
+function saveSession(user) {
+    try {
+        sessionStorage.setItem("iot_session", JSON.stringify({
+            email: user.email || "",
+            name: user.displayName || "",
+            photo: user.photoURL || "",
+            ts: Date.now()
+        }));
+    } catch (e) { /* storage unavailable */ }
+}
+
+function redirectAfterSignIn() {
+    window.location.href = "landing.html";
+}
+
+// =====================================================
+// EMAIL + PASSWORD
+// =====================================================
+
+function setBusy(on) {
+    busy = on;
+    $("authSubmit").disabled = on;
+    $("googleBtn").disabled = on;
+}
+
+function validEmail(v) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+}
+
+function describeError(err) {
+    const code = err && err.code ? String(err.code) : "";
+    if (code.indexOf("invalid-email") !== -1) return "Enter a valid email address.";
+    if (code.indexOf("wrong-password") !== -1 || code.indexOf("invalid-credential") !== -1)
+        return "The password you entered is incorrect.";
+    if (code.indexOf("user-not-found") !== -1) return "No account found with this email.";
+    if (code.indexOf("user-disabled") !== -1) return "This account has been disabled.";
+    if (code.indexOf("email-already-in-use") !== -1) return "An account with this email already exists.";
+    if (code.indexOf("weak-password") !== -1) return "Password should be at least 6 characters.";
+    if (code.indexOf("too-many-requests") !== -1) return "Too many attempts. Please try again later.";
+    if (code.indexOf("network-request-failed") !== -1) return "Network error — check your connection.";
+    if (code.indexOf("operation-not-allowed") !== -1)
+        return "Email/password sign-in is not enabled in this Firebase project.";
+    return code ? "Error: " + code : "Something went wrong. Please try again.";
+}
+
+async function handleEmailPassword(e) {
+    e.preventDefault();
+    clearStatus();
+    if (!CONFIG_VALID) {
+        $("configNotice").hidden = false;
+        return;
+    }
+    if (busy) return;
+
+    const email = $("authEmail").value.trim();
+    const pass = $("authPass").value;
+    const confirm = $("authConfirm").value;
+
+    if (!validEmail(email)) {
+        setStatus("Enter a valid email address.", "error");
+        $("authEmail").focus();
+        return;
+    }
+    if (!pass) {
+        setStatus("Enter your password.", "error");
+        $("authPass").focus();
+        return;
+    }
+    if (authMode === "signup" && pass.length < 6) {
+        setStatus("Password should be at least 6 characters.", "error");
+        $("authPass").focus();
+        return;
+    }
+    if (authMode === "signup" && pass !== confirm) {
+        setStatus("Passwords don't match.", "error");
+        $("authConfirm").focus();
+        return;
+    }
+
+    setBusy(true);
+    setStatus("Signing in\u2026", "ok");
+    try {
+        const fb = await ensureFirebase();
+        let user;
+        if (authMode === "signin") {
+            const cred = await fb.authMod.signInWithEmailAndPassword(fb.auth, email, pass);
+            user = cred.user;
+        } else {
+            const cred = await fb.authMod.createUserWithEmailAndPassword(fb.auth, email, pass);
+            user = cred.user;
+        }
+        saveSession(user);
+        setStatus(authMode === "signin" ? "Signed in — redirecting\u2026"
+                                        : "Account created — signing you in\u2026", "ok");
+        setTimeout(redirectAfterSignIn, 400);
+    } catch (err) {
+        console.error("Authentication failed", err);
+        setStatus(describeError(err), "error");
+        setBusy(false);
+    }
+}
+
+// =====================================================
+// PASSWORD VISIBILITY
+// =====================================================
+
+$("passToggle").addEventListener("click", function () {
+    const input = $("authPass");
+    const show = input.type === "password";
+    input.type = show ? "text" : "password";
+    this.setAttribute("aria-label", show ? "Hide password" : "Show password");
+    this.querySelector("span").textContent = show ? "Hide" : "Show";
+});
+
+// =====================================================
+// SIGN-IN / SIGN-UP SWITCH
+// =====================================================
+
+function setMode(mode) {
+    authMode = mode;
+    clearStatus();
+
+    const confirmField = $("confirmField");
+    const confirmInput = $("authConfirm");
+    const isSignup = mode === "signup";
+
+    confirmField.hidden = !isSignup;
+    confirmInput.disabled = !isSignup;
+    confirmInput.required = isSignup;
+    confirmInput.value = "";
+
+    $("authPass").autocomplete = isSignup ? "new-password" : "current-password";
+    $("authSubmit").textContent = isSignup ? "CREATE ACCOUNT" : "SIGN IN";
+
+    $("authTitle").textContent = isSignup ? "Create your account." : "Welcome back.";
+    $("authSub").textContent = isSignup
+        ? "Enter your email and choose a password. No card, no setup."
+        : "Sign in to check your environment and control your appliances.";
+
+    $("authSwitch").innerHTML = isSignup
+        ? "Already have an account? <button type=\"button\" class=\"link\" id=\"switchBtn\">Sign in</button>"
+        : "New here? <button type=\"button\" class=\"link\" id=\"switchBtn\">Create an account</button>";
+
+    const btn = $("switchBtn");
+    btn.addEventListener("click", function () {
+        setMode(isSignup ? "signin" : "signup");
+    });
+
+    const focusTarget = isSignup ? confirmInput : $("authEmail");
+    focusTarget.focus();
+}
+
+// =====================================================
+// GOOGLE SIGN-IN
+// =====================================================
+
+async function signInWithGoogle() {
+    clearStatus();
+    if (!CONFIG_VALID) {
+        $("configNotice").hidden = false;
+        return;
+    }
+    if (busy) return;
+
+    setBusy(true);
+    setStatus("Loading Google\u2026", "ok");
+    try {
+        const fb = await ensureFirebase();
+
+        if (fb.auth.currentUser) {
+            saveSession(fb.auth.currentUser);
+            setTimeout(redirectAfterSignIn, 200);
+            return;
+        }
+
+        setStatus("Waiting for Google\u2026", "ok");
+        const provider = new fb.authMod.GoogleAuthProvider();
+        let result;
+        try {
+            result = await fb.authMod.signInWithPopup(fb.auth, provider);
+        } catch (popupErr) {
+            if (popupErr.code === "auth/popup-blocked" || popupErr.code === "auth/cancelled-popup-request") {
+                setStatus("Popup blocked — redirecting\u2026");
+                await fb.authMod.signInWithRedirect(fb.auth, provider);
+                return;
+            }
+            throw popupErr;
+        }
+
+        saveSession(result.user);
+        setStatus("Signed in — redirecting\u2026", "ok");
+        setTimeout(redirectAfterSignIn, 400);
+    } catch (err) {
+        console.error("Google sign-in failed", err);
+        setStatus(describeError(err), "error");
+        setBusy(false);
+    }
+}
+
+// =====================================================
+// WIRING
+// =====================================================
+
+$("authForm").addEventListener("submit", handleEmailPassword);
+$("googleBtn").addEventListener("click", signInWithGoogle);
+document.getElementById("switchBtn").addEventListener("click", function () {
+    setMode("signup");
+});
+
+["authEmail", "authPass", "authConfirm"].forEach(function (id) {
+    $(id).addEventListener("input", clearStatus);
+});
+
+if (!CONFIG_VALID) {
+    $("configNotice").hidden = false;
+}
+</script>
+</body>
+</html>

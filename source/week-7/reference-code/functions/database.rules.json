@@ -1,0 +1,21 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || auth.token.email === 'YOUR_DEVICE_EMAIL')",
+        "bulb": {
+          ".write": "auth != null && auth.uid === $uid",
+          ".validate": "newData.isBoolean()"
+        },
+        "settings": {
+          ".write": "auth != null && auth.uid === $uid",
+          "mode": { ".validate": "newData.isString() && (newData.val() === 'manual' || newData.val() === 'auto')" },
+          "threshold": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 4095" }
+        },
+        "readings": {
+          ".write": "auth != null && auth.token.email === 'YOUR_DEVICE_EMAIL'"
+        }
+      }
+    }
+  }
+}

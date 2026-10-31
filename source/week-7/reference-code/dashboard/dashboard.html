@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Forge - Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Forge</h1>
+    <div class="row">
+      <span id="who" class="status"></span>
+      <button id="out" class="btn ghost" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <p id="status" class="status"><b></b><span>Connecting...</span></p>
+  <p id="err" class="msg" role="alert"></p>
+
+  <div class="grid">
+    <div class="card"><small>Temperature</small><div class="value"><em id="temp">--</em><span>&deg;C</span></div></div>
+    <div class="card"><small>Humidity</small><div class="value"><em id="hum">--</em><span>%</span></div></div>
+    <div class="card"><small>Light (0-4095)</small><div class="value"><em id="light">--</em></div></div>
+  </div>
+
+  <section class="card">
+    <div class="row">
+      <div class="row" style="gap:16px">
+        <svg id="bulb" class="bulb" viewBox="0 0 24 24" stroke="#f1923e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/>
+        </svg>
+        <div><h2>Bulb</h2><div id="bulbNote" class="status">--</div></div>
+      </div>
+      <span class="switch"><input id="toggle" type="checkbox" role="switch" aria-label="Bulb on or off"><i></i></span>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="row">
+      <div><h2>Mode</h2><div class="status">Manual follows the toggle. Automatic follows the light.</div></div>
+      <div class="seg" role="group" aria-label="Mode">
+        <button type="button" data-mode="manual" aria-pressed="true">Manual</button>
+        <button type="button" data-mode="auto" aria-pressed="false">Automatic</button>
+      </div>
+    </div>
+    <div style="margin-top:18px">
+      <div class="row"><label for="range" style="display:inline">Light sensitivity (threshold)</label><strong id="rangeOut">2000</strong></div>
+      <input id="range" type="range" min="0" max="4095" step="1" value="2000">
+      <div class="status">In automatic mode the bulb switches on when the light reading is above this number.</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="row" style="margin-bottom:12px">
+      <h2>History</h2>
+      <button id="csv" class="btn ghost" type="button">Export CSV</button>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Time</th><th>Temp &deg;C</th><th>Humidity %</th><th>Light</th><th>Bulb</th></tr></thead>
+        <tbody id="rows"><tr><td colspan="5" class="status">Waiting for the first reading...</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<script type="module">
+  import { auth, db } from "./firebase-config.js";
+  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { ref, onValue, set, update, get, query, limitToLast }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  const $ = (id) => document.getElementById(id);
+  let base = "", started = false;
+  let bulbWanted = false, mode = "manual", threshold = 2000, latest = null, history = [];
+
+  const say = (text) => { $("err").textContent = text || ""; };
+  const readError = () => say("Cannot read your data. Check that you are signed in and that the security rules are published.");
+  const writeError = () => say("That change could not be sent. Check your connection and try again.");
+  const num = (v, digits) => (typeof v === "number" && isFinite(v)) ? v.toFixed(digits) : "--";
+
+  // ---- sign in guard ----
+  onAuthStateChanged(auth, (user) => {
+    if (!user) { location.replace("login.html"); return; }
+    base = "users/" + user.uid;
+    $("who").textContent = user.email || "";
+    start();
+  });
+  $("out").addEventListener("click", () => signOut(auth));
+
+  // ---- live listeners: the page updates itself the moment the data changes ----
+  function start() {
+    if (started) return;
+    started = true;
+
+    onValue(ref(db, base + "/bulb"), (snap) => { bulbWanted = snap.val() === true; render(); }, readError);
+
+    onValue(ref(db, base + "/settings"), (snap) => {
+      const v = snap.val() || {};
+      mode = v.mode === "auto" ? "auto" : "manual";
+      if (typeof v.threshold === "number") threshold = v.threshold;
+      render();
+    }, readError);
+
+    onValue(query(ref(db, base + "/readings"), limitToLast(20)), (snap) => {
+      const rows = [];
+      snap.forEach((child) => { rows.push({ ts: Number(child.key), ...child.val() }); });
+      rows.sort((a, b) => a.ts - b.ts);
+      history = rows;
+      latest = rows.length ? rows[rows.length - 1] : null;
+      render();
+    }, readError);
+
+    setInterval(renderStatus, 1000);
+  }
+
+  // ---- drawing ----
+  function render() {
+    say("");
+    $("temp").textContent  = latest ? num(latest.temperature, 1) : "--";
+    $("hum").textContent   = latest ? num(latest.humidity, 0) : "--";
+    $("light").textContent = latest ? num(latest.light, 0) : "--";
+
+    // manual: show what you asked for. automatic: show what the relay is actually doing.
+    const on = mode === "auto" ? !!(latest && latest.relay) : bulbWanted;
+    $("toggle").checked = on;
+    $("toggle").disabled = mode === "auto";
+    $("bulb").classList.toggle("on", on);
+    $("bulbNote").textContent = mode === "auto" ? "Automatic - the light sensor decides" : (on ? "On (manual)" : "Off (manual)");
+
+    document.querySelectorAll("[data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === mode)));
+    if (document.activeElement !== $("range")) { $("range").value = threshold; $("rangeOut").textContent = threshold; }
+
+    const body = $("rows");
+    body.textContent = "";
+    if (!history.length) {
+      const tr = document.createElement("tr"), td = document.createElement("td");
+      td.colSpan = 5; td.className = "status"; td.textContent = "Waiting for the first reading...";
+      tr.append(td); body.append(tr);
+    }
+    history.slice().reverse().forEach((r) => {
+      const tr = document.createElement("tr");
+      [new Date(r.ts * 1000).toLocaleTimeString(), num(r.temperature, 1), num(r.humidity, 0), num(r.light, 0), r.relay ? "ON" : "OFF"]
+        .forEach((text) => { const td = document.createElement("td"); td.textContent = text; tr.append(td); });
+      body.append(tr);
+    });
+    renderStatus();
+  }
+
+  function renderStatus() {
+    const el = $("status");
+    if (!latest) { el.classList.remove("live"); el.lastChild.textContent = "Waiting for the first reading..."; return; }
+    const age = Math.max(0, Math.round(Date.now() / 1000 - latest.ts));
+    const live = age < 15;
+    el.classList.toggle("live", live);
+    el.lastChild.textContent = live ? "Live - updated " + age + " s ago" : "Device offline - last reading " + (age < 3600 ? Math.round(age / 60) + " min" : Math.round(age / 3600) + " h") + " ago";
+  }
+
+  // ---- controls ----
+  $("toggle").addEventListener("change", (e) => {
+    if (mode === "auto") return;
+    set(ref(db, base + "/bulb"), e.target.checked).catch(writeError);
+  });
+
+  document.querySelectorAll("[data-mode]").forEach((b) => b.addEventListener("click", () => {
+    update(ref(db, base + "/settings"), { mode: b.dataset.mode }).catch(writeError);
+  }));
+
+  $("range").addEventListener("input", (e) => { $("rangeOut").textContent = e.target.value; });
+  $("range").addEventListener("change", (e) => {
+    const v = Math.round(Number(e.target.value));
+    if (!(v >= 0 && v <= 4095)) return;          // the ESP32 ADC only reads 0-4095
+    update(ref(db, base + "/settings"), { threshold: v }).catch(writeError);
+  });
+
+  // ---- one-click CSV export (up to the latest 5000 readings) ----
+  $("csv").addEventListener("click", async () => {
+    const btn = $("csv");
+    btn.disabled = true;
+    try {
+      const snap = await get(query(ref(db, base + "/readings"), limitToLast(5000)));
+      const rows = [["time_iso", "unix_time", "temperature_c", "humidity_percent", "light_0_4095", "bulb"]];
+      snap.forEach((child) => {
+        const v = child.val();
+        rows.push([new Date(Number(child.key) * 1000).toISOString(), child.key, v.temperature, v.humidity, v.light, v.relay ? "ON" : "OFF"]);
+      });
+      if (rows.length === 1) { say("There are no readings to export yet."); return; }
+      const blob = new Blob([rows.map((r) => r.join(",")).join("\n")], { type: "text/csv" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "forge-readings.csv";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } catch (err) {
+      say("Could not export the data. Try again.");
+    } finally {
+      btn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
