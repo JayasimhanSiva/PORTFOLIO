@@ -57,25 +57,22 @@ if (!document.body.classList.contains('no-lenis')) {
 const scrollToTop = () => lenis ? lenis.scrollTo(0, { duration: 1.6 }) : scrollTo({ top: 0, behavior: 'smooth' });
 $$('[data-top]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); scrollToTop(); }));
 
-/* ---------- cursor: GPU-only transform, tight follow ---------- */
+/* ---------- cursor: sits exactly on the pointer (no trailing), one write per frame ---------- */
 const cursor = $('.cursor');
 if (cursor && !isTouch) {
   const pill = $('.cursor__pill', cursor);
-  let mx = innerWidth / 2, my = innerHeight / 2, cx = mx, cy = my;
-  let running = false, last = 0;
-  const step = now => {
-    const dt = Math.min(50, now - (last || now)); last = now;
-    const k = 1 - Math.pow(1 - .38, dt / 16.67);          /* frame-rate independent follow */
-    cx += (mx - cx) * k; cy += (my - cy) * k;
-    cursor.style.transform = `translate3d(${cx}px,${cy}px,0)`;
-    if (Math.abs(mx - cx) + Math.abs(my - cy) > .1) requestAnimationFrame(step); else { running = false; last = 0; }
-  };
-  addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY; if (!running) { running = true; requestAnimationFrame(step); } }, { passive: true });
-  cursor.style.transform = `translate3d(${cx}px,${cy}px,0)`;
+  let mx = innerWidth / 2, my = innerHeight / 2, queued = false;
+  const paint = () => { queued = false; cursor.style.transform = `translate3d(${mx}px,${my}px,0)`; };
+  const move = e => { mx = e.clientX; my = e.clientY; if (!queued) { queued = true; requestAnimationFrame(paint); } };
+  addEventListener('pointermove', move, { passive: true });
+  addEventListener('pointerdown', move, { passive: true });
+  paint();
   document.addEventListener('mouseleave', () => cursor.classList.add('is-hide'));
   document.addEventListener('mouseenter', () => cursor.classList.remove('is-hide'));
+  let lastT = null;
   document.addEventListener('pointerover', e => {
     const t = e.target.closest('[data-cursor]');
+    if (t === lastT) return; lastT = t;
     if (t) { pill.textContent = t.dataset.cursor; cursor.classList.add('is-pill'); }
     else cursor.classList.remove('is-pill');
   });
@@ -107,6 +104,9 @@ if (nav) {
   const set = () => { if (!nav.classList.contains('is-morph')) nav.classList.toggle('is-scrolled', always || scrollY > innerHeight * .55); };
   set(); addEventListener('scroll', set, { passive: true });
 }
+/* solid black strip behind the nav once content scrolls under it (after the hero morph on the home page) */
+const solid = () => { const y = lenis ? lenis.scroll : scrollY; document.body.classList.toggle('nav-solid', y > ($('.hero') ? innerHeight * .64 : 24)); };
+lenis ? lenis.on('scroll', solid) : addEventListener('scroll', solid, { passive: true }); solid();
 const mbtn = $('.nav__menu-btn'), mnav = $('.mnav');
 if (mbtn && mnav) mbtn.addEventListener('click', () => { mnav.classList.toggle('open'); mbtn.querySelector('span').textContent = mnav.classList.contains('open') ? 'CLOSE' : 'MENU'; });
 
@@ -249,36 +249,45 @@ $$('.deckstack').forEach(stack => {
   });
   size(); layout(false);
   addEventListener('resize', () => { size(); layout(false); });
-  let busy = false;
+  let busy = false, trail = [];
+  /* release: the card leaves from exactly where it was let go and glides straight to its slot */
+  const glide = d => Math.min(.95, .6 + d / 1400);
   const makeDrag = () => Draggable.create(cards[0], {
     type: 'x,y', zIndexBoost: false,
     onPress() {
       if (busy) return this.endDrag();
+      trail = [];
+      gsap.killTweensOf(this.target);
       gsap.to(this.target, { scale: 1.02, duration: .3, ease: 'power3.out' });
       stack.classList.add('dragging');                    /* the card underneath shows its content */
       gsap.to(cards[1], { ...pose(0), duration: .45, ease: 'power3.out', overwrite: 'auto' });
     },
-    onDrag() { gsap.set(this.target, { rotation: gsap.utils.clamp(-10, 10, this.x / 30) }); },
+    onDrag() {
+      const now = performance.now(); trail.push([now, this.x, this.y]); while (trail.length > 2 && now - trail[0][0] > 90) trail.shift();
+      gsap.set(this.target, { rotation: gsap.utils.clamp(-10, 10, this.x / 30) });
+    },
     onRelease() {
-      const card = this.target, dist = Math.hypot(this.x, this.y), thresh = Math.min(160, stack.offsetWidth * .22);
-      if (dist < thresh) {                              /* not far enough: spring back */
-        gsap.to(card, { ...pose(0), duration: 1.1, ease: 'elastic.out(1,0.55)' });
+      const card = this.target, x = this.x, y = this.y, dist = Math.hypot(x, y);
+      const t0 = trail[0], t1 = trail[trail.length - 1], dt = t0 && t1 ? Math.max(1, t1[0] - t0[0]) : 1;
+      const speed = t0 && t1 ? Math.hypot(t1[1] - t0[1], t1[2] - t0[2]) / dt : 0;       /* px per ms */
+      const thresh = Math.min(160, stack.offsetWidth * .22);
+      if (dist < thresh && speed < .9) {                 /* not far enough: settle back from where it was let go */
+        gsap.to(card, { ...pose(0), duration: glide(dist), ease: 'expo.out', overwrite: true });
         stack.classList.remove('dragging'); gsap.to(cards[1], { ...pose(1), duration: .6, ease: 'power3.out', overwrite: 'auto' });
         return;
       }
       if (busy) return;                                  /* one release = one card, never twice */
       busy = true;
-      const dir = this.x >= 0 ? 1 : -1, back = cards.length - 1, x = this.x, y = this.y;
+      const back = cards.length - 1;
       this.kill();
-      card.classList.add('is-flying');                   /* keeps its text while it flies out + back */
-      cards.push(cards.shift());                         /* thrown card joins the back — exactly once */
+      card.classList.add('is-flying');                   /* keeps its text while it slides behind */
+      cards.push(cards.shift());                         /* released card joins the back — exactly once */
       stack.classList.remove('dragging');
       cards.forEach((c, i) => { c.classList.toggle('is-front', i === 0); c.classList.toggle('is-next', i === 1); });
       cards.slice(0, -1).forEach((c, i) => { c.style.zIndex = 10 - i; gsap.to(c, { ...pose(i), duration: .7, ease: 'power3.out', overwrite: 'auto' }); });
-      gsap.timeline({ onComplete() { card.classList.remove('is-flying'); busy = false; makeDrag(); } })
-        .to(card, { x: x + dir * stack.offsetWidth * .55, y: y * 1.2 - 30, rotation: dir * 14, duration: .38, ease: 'power2.in', overwrite: 'auto' })
-        .call(() => { card.style.zIndex = 10 - back; })
-        .to(card, { ...pose(back), duration: .7, ease: 'power3.out' });
+      card.style.zIndex = 10 - back;                     /* goes under the new front card straight away, from where it was let go */
+      gsap.to(card, { ...pose(back), duration: glide(dist), ease: 'expo.out', overwrite: true,
+        onComplete() { card.classList.remove('is-flying'); busy = false; makeDrag(); } });
     }
   });
   makeDrag();
@@ -295,7 +304,11 @@ $$('.nav > *:not(.nav__logo)').forEach((c, i) => c.style.setProperty('--i', i));
 function intro() {
   heroT && heroT.classList.add('h-in');
   nav && nav.classList.add('n-in');
-  if (heroT) setTimeout(() => heroT.classList.add('grad-live'), 1400 + heroChars.length * 45 + 150);
+  if (heroT) setTimeout(() => {
+    heroT.classList.add('grad-live');
+    /* the sheen is a pre-painted second copy cross-fading on the GPU: no repaint, ever */
+    if (!heroT.querySelector('.hero__sheen')) { const s = document.createElement('span'); s.className = 'hero__sheen'; s.setAttribute('aria-hidden', 'true'); s.innerHTML = heroT.innerHTML; heroT.append(s); }
+  }, 1400 + heroChars.length * 45 + 150);
 }
 /* "Hello World" preloader: first visit of the session only */
 let seenLoader = false;
@@ -348,7 +361,11 @@ if (heroT && nav) {
     logo.style.opacity = fade;
     links.forEach((a, i) => a.style.transform = `translate3d(${G.dx[i] * (1 - p)}px,0,0)`);
     if (heroCanvas) heroCanvas.style.opacity = 1 - .85 * Math.min(1, y / G.heroH);
+    /* the sheen repaints the name every frame: hold it while scrolling or once the name has gone */
+    heroT.classList.add('is-still'); clearTimeout(stillT);
+    if (p < 1) stillT = setTimeout(() => heroT.classList.remove('is-still'), 450);
   };
+  let stillT = 0;
   morph = { measure, apply };
   measure();
   lenis ? lenis.on('scroll', apply) : addEventListener('scroll', apply, { passive: true });

@@ -161,3 +161,14 @@ a.wrow{text-decoration:none;color:var(--fg)}
 
 /* "Entry in progress": wrap inside the screen instead of running off it */
 .wip__word{width:auto;max-width:100%;white-space:normal;text-wrap:balance}
+
+/* ===== no page-level week rail: the list is the navigation; unwritten weeks are one quiet row ===== */
+.ps-list{padding-top:calc(150 * var(--u))}
+.wrow.is-static{cursor:none}
+.wrow.is-static::before{display:none}
+.wrow.is-static:hover .wrow__t .roll span{transform:none}
+/* black strip behind the nav once the list scrolls under it (same as the task pages) */
+body::before{content:"";position:fixed;left:0;right:0;top:0;height:calc(62 * var(--u));z-index:90;background:#000;opacity:0;pointer-events:none;transition:opacity .4s var(--ease)}
+body.ps-scrolled::before{opacity:1}
+@media (max-width:809px){body::before{height:52px}.ps-list{padding-top:56px}}
+@media (max-width:809px){#wlist .wrow{grid-template-columns:88px minmax(0,1fr)}}

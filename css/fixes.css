@@ -139,12 +139,12 @@ section,footer{contain:paint}
 .t-protosem{font-size:calc((97.08vw - 22px) / 5.2978 * .94)!important}
 .t-projects{font-size:calc((97.08vw - 22px) / 4.9828 * .94)!important}
 .t-sw{font-size:calc((97.08vw - 22px) / 6.5579 * .94)!important}
-.t-about{font-size:calc((97.08vw - 36px) / 4.6804 * .94)!important}
+.t-about{font-size:calc((97.08vw - 36px) / 4.8386 * .94)!important}
 @media (max-width:809px){
   .t-protosem{font-size:calc((100vw - 38px) / 5.2978 * .94)!important}
   .t-projects{font-size:calc((100vw - 38px) / 4.9828 * .94)!important}
   .t-sw{font-size:calc((100vw - 38px) / 6.5579 * .94)!important}
-  .t-about{font-size:calc((100vw - 52px) / 4.6804 * .94)!important}
+  .t-about{font-size:calc((100vw - 52px) / 4.8386 * .94)!important}
 }
 /* never let anything push the page sideways */
 .stitle,.page-title,.ps-title,.ab-word{max-width:100vw;overflow:hidden}
@@ -179,8 +179,6 @@ section,footer{contain:paint}
 .intern li::before{content:"";position:absolute;left:0;top:.65em;width:5px;height:1px;background:#888}
 /* reference fan: back cards show only their paper left panel, rising from the bottom-left */
 .deckstack .deck{transform-origin:0% 100%}
-.deckstack .deck:not(.is-front) .deck__r{opacity:0;transition:opacity .25s ease}
-.deckstack .deck.is-front .deck__r{opacity:1;transition:opacity .45s ease .15s}
 /* while the front card is dragged, the next card is fully readable underneath */
 .deckstack.dragging .deck.is-next .deck__l-in,
 .deckstack.dragging .deck.is-next .deck__r,
@@ -286,3 +284,47 @@ section,footer{contain:paint}
 .can__item{overflow:visible;clip-path:inset(.06em -.06em -.075em -.06em)}
 .can__item .roll{overflow:visible;clip-path:inset(.06em -.06em -.075em -.06em)}
 .can__item .roll span + span{color:#f1923e}
+
+/* ===== Projects: the three mini projects written out (no picture slots) ===== */
+.pj{padding:calc(110 * var(--u)) var(--pad) calc(200 * var(--u))}
+.pj__item{display:grid;grid-template-columns:calc(237 * var(--u)) minmax(0,1fr);padding:calc(64 * var(--u)) 0;border-top:1px solid rgba(255,255,255,.12)}
+.pj__item:last-child{border-bottom:1px solid rgba(255,255,255,.12)}
+.pj__k{display:flex;gap:8px;padding-top:calc(14 * var(--u))}
+.pj__t{font-family:var(--sans);font-weight:500;font-size:max(28px,calc(56 * var(--u)));line-height:1.08;letter-spacing:-.03em}
+.pj__meta{margin:calc(30 * var(--u)) 0 calc(36 * var(--u))}
+.pj__list{list-style:none;max-width:calc(960 * var(--u))}
+.pj__list li{font-family:var(--sans);font-weight:500;font-size:max(17px,calc(24 * var(--u)));line-height:1.4;letter-spacing:-.01em;color:#e9e6e4}
+.pj__list li + li{margin-top:.8em}
+.pj__list li::before{content:"\2014  ";color:var(--stone)}
+@media (max-width:809px){
+  .pj{padding:56px var(--pad) 120px}
+  .pj__item{grid-template-columns:1fr;row-gap:14px;padding:40px 0}
+  .pj__k{padding-top:0}
+  .pj__t{font-size:30px}
+  .pj__meta{grid-template-columns:1fr 1fr;margin:22px 0 24px}
+  .pj__list li{font-size:17px}
+}
+/* hero sheen: paused while scrolling and once the name has left (no per-frame repaint during scroll) */
+.hero__title.grad-live.is-still{animation-play-state:paused}
+/* ===== About: intro label + text in the site's two-column grid, title centred like every other page title ===== */
+.ab-intro{display:grid;grid-template-columns:calc(237 * var(--u)) minmax(0,1fr);padding-left:var(--pad);padding-right:var(--pad)}
+.ab-intro > .mono{padding-top:.35em}
+.ab-word{padding-left:var(--pad);padding-right:var(--pad);text-align:center}
+@media (max-width:809px){.ab-intro{grid-template-columns:1fr;row-gap:16px}.ab-intro > .mono{padding-top:0}}
+/* the open phone menu must sit under the nav so MENU/CLOSE stays tappable */
+.mnav{z-index:95}
+/* hero sheen without repaints: the title keeps one gradient position, a pre-painted copy at the other
+   position fades in and out on the compositor (opacity only) */
+.hero__title.grad-live{animation:none;background-position:0% 50%}
+.hero__sheen{position:absolute;left:0;top:0;white-space:nowrap;pointer-events:none;
+  background:linear-gradient(100deg,#f5fdff 0%,#c4f0f9 18%,#62cde6 42%,#3fbad8 55%,#c4f0f9 78%,#f5fdff 100%);
+  background-size:220% 100%;background-position:100% 50%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  opacity:0;will-change:opacity;animation:heroSheenFade 5.5s ease-in-out infinite alternate}
+.hero__title.is-still .hero__sheen{animation-play-state:paused}
+@keyframes heroSheenFade{to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.hero__sheen{animation:none}}
+/* every page: a black strip behind the nav once content scrolls under it */
+body::before{content:"";position:fixed;left:0;right:0;top:0;height:calc(62 * var(--u));z-index:90;background:#000;opacity:0;pointer-events:none;transition:opacity .4s var(--ease)}
+body.nav-solid::before{opacity:1}
+@media (max-width:809px){body::before{height:52px}}
+.wrow.is-static .wrow__n{white-space:nowrap}
